@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.pyc
+
+models/
+*.onnx
+
+data/
+*.jpg
+*.jpeg
+*.png
+*.mp4
+
+.vscode/
