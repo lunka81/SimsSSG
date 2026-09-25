@@ -16,9 +16,19 @@ ENFORCE_DETECTION = False
 USE_CUDA = True
 
 # Probe images to test: distance 1 = 4.2 m, 2 = 2.6 m, 3 = 1.0 m
-DISTANCES = [1, 2, 3]
+# Only distance 3 is used, it best matches the intended use case
+DISTANCES = [3]
 # Cameras 1-5 are visible light; add 6 and 7 to include the IR cameras
 CAMERAS = [1, 2, 3, 4, 5]
 
-# Where the results table is saved
+# Security clearance test: half of the subjects are enrolled (have clearance),
+# the other half are not. The seed makes the same people get picked every run
+CLEARANCE_SEED = 0
+# DeepFace confidence thresholds (0-100) for granting access.
+# 50 is the same decision as DeepFace.verify with its default threshold
+CONFIDENCE_THRESHOLDS = list(range(50, 70, 5))
+
+# Where the results are saved
 RESULTS_FILE = Path(__file__).parent / "results.csv"
+CONFUSION_FILE = Path(__file__).parent / "confusion_matrices.csv"
+CONFUSION_PLOT = Path(__file__).parent / "confusion_matrices.png"

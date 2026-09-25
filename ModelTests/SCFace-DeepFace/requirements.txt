@@ -9,3 +9,4 @@ retina-face==0.0.18
 opencv-python==5.0.0.93
 numpy==2.4.6
 tqdm==4.70.1
+matplotlib==3.11.2

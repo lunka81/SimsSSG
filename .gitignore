@@ -6,3 +6,5 @@ __pycache__/
 /ModelTests/SCFace-DeepFace/SCface_database/
 /ModelTests/SCFace-DeepFace/SCface_database.zip
 /ModelTests/SCFace-DeepFace/results.csv
+/ModelTests/SCFace-DeepFace/confusion_matrices.csv
+/ModelTests/SCFace-DeepFace/confusion_matrices.png
