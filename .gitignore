@@ -1,0 +1,8 @@
+# Python
+__pycache__/
+*.pyc
+
+# SCFace-DeepFace: dataset and generated results
+/ModelTests/SCFace-DeepFace/SCface_database/
+/ModelTests/SCFace-DeepFace/SCface_database.zip
+/ModelTests/SCFace-DeepFace/results.csv
