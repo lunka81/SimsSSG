@@ -30,7 +30,7 @@ def plot_confusion_matrices(matrices, title, output_file):
         ax.set_title(f"Confidence ≥ {m['threshold']}\n"
                      f"FP-rate {m['FAR']:.1%} · FN-rate {m['FRR']:.1%}", fontsize=10)
         ax.set_xticks([0, 1], ["Granted", "Denied"])
-        ax.set_yticks([0, 1], ["Cleared", "Not cleared"])
+        ax.set_yticks([0, 1], ["Clearance", "No clearance"])
         ax.set_xlabel("Access decision")
         ax.set_ylabel("Actual")
 

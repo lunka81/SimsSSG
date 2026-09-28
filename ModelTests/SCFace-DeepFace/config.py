@@ -6,7 +6,10 @@ from pathlib import Path
 DATASET_DIR = Path(__file__).parent / "SCface_database"
 
 # DeepFace settings
+# options: VGG-Face, Facenet, Facenet512, OpenFace, DeepFace, DeepID, Dlib, ArcFace, SFace, GhostFaceNet
 MODEL_NAME = "SFace"
+# options: opencv, retinaface, mtcnn, fastmtcnn, ssd, dlib, mediapipe, yunet, centerface,
+# yolov8n/m/l, yolov11n/s/m/l, yolov12n/s/m/l, skip (no detection, use the whole image)
 DETECTOR_BACKEND = "retinaface"
 # If no face is found (common for the small distance-1 images),
 # use the whole image instead of raising an error
