@@ -14,7 +14,6 @@ class Employee(Base):
     name: Mapped[str] = mapped_column(
                 String, nullable=False
     )
-    '''
     embedding: Mapped[list[float]] = mapped_column(
         Vector(512), nullable=False
     )
@@ -33,4 +32,4 @@ class Employee(Base):
     picture : Mapped[bytes] = mapped_column(
         LargeBinary, nullable=False
     )
-    '''
+    
