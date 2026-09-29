@@ -1,0 +1,35 @@
+.app {
+  width: 100%;
+  min-height: 100vh;
+  padding: clamp(20px, 3vh, 40px) clamp(20px, 4vw, 64px);
+}
+ 
+.content {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/*Barnen placerias med CSS grid (kamera, databas, confidence*/
+.recognition {
+  display: grid;
+  /*Mitten tar så stor plats den behöver, de andra två delar lika (fr=fraction)*/
+  grid-template-columns: 1fr auto 1fr;
+  /*Centrerat inom grid*/
+  align-items: center;
+  gap: clamp(20px, 4vw, 60px);
+  /*Använder hela bredden av föräldern (.content)*/
+  width: 100%;
+}
+
+.access-res {
+  margin-top: clamp(15px, 3vh, 30px);
+}
+
+/*Används för mobila enheter*/
+@media (max-width: 800px) {
+  .recognition {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+}
