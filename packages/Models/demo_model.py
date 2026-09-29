@@ -11,9 +11,6 @@ class Employee(Base):
     id: Mapped[int] = mapped_column(
         Integer, primary_key=True, index=True
     )
-    name: Mapped[str] = mapped_column(
-                String, nullable=False
-    )
     embedding: Mapped[list[float]] = mapped_column(
         Vector(512), nullable=False
     )

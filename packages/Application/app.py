@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
@@ -25,10 +25,17 @@ def get_db():
         db.close()
 
 
+class EmployeeOut(BaseModel): 
+    model_config = ConfigDict(from_attributes=True)  # lets pydantic read SQLAlchemy objects
+    id: int
+    name: str
+    approved: bool
+    logs: list[str]
+    timestamp: datetime
 
-@app.get("/employees")
+@app.get("/employees", response_model=list[EmployeeOut])
 #En session per requst
-#FastAPI anropar get_db, som ber om en db-session, som tilldelas till var db inom funktionens scope.
+#FastAPI anropar get_db, som ber om en db-session, som tilldelas till db inom funktionens scope.
 def get_employees(db: Session = Depends(get_db)):
     employees = db.query(Employee).all()
     return employees
@@ -43,13 +50,7 @@ class EmployeeCreate(BaseModel): #Så att fastAPI förväntar sig json.
 #olika attribut accepteras på vägen in och på vägen ut.
 #om svaret innehåller bild och embedding försöker FastAPI översätta det till json och kraschar. 
 #dessa värden läggs till i databasen men inkluderas inte i http-response. 
-class EmployeeOut(BaseModel): 
-    model_config = ConfigDict(from_attributes=True)  # lets pydantic read SQLAlchemy objects
-    id: int
-    name: str
-    approved: bool
-    logs: list[str]
-    timestamp: datetime
+
 
 
 @app.post("/employees", response_model=EmployeeOut)
@@ -67,9 +68,14 @@ def create_employee(employee: EmployeeCreate, db: Session = Depends(get_db)):
     db.refresh(new_emp)
     return new_emp
 
-'''@app.post("/hello/{user}")
-def greet(user: str):
-    return{
-        "message": f"Hello {user}"
-    }
-'''
+#empty response body
+@app.delete("/employees", status_code=status.HTTP_204_NO_CONTENT)
+def delete_employee(emp_id : int, db : Session = Depends(get_db)):
+    emp = db.get(Employee, emp_id) 
+    if emp is None: #if id isn't found cached or in db
+        raise HTTPException(status_code=404, detail="Employee not found.")
+
+    db.delete(emp)
+    db.commit()
+
+
