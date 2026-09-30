@@ -1,22 +1,15 @@
 import requests
 import time
-#from gpiozero import LED
-from gpiozero import AngularServo, LED
-
 from config import (
-	DEVICE_ID, FAIL_COOLDOWN, GREEN_LED_PIN, RECOGNITION_COOLDOWN, RED_LED_PIN, SEND_INTERVAL,
-	SERVER_TIMEOUT, SERVER_URL, SERVO_LOCKED_ANGLE, SERVO_PIN, SERVO_UNLOCKED_ANGLE,
+	DEVICE_ID, RECOGNITION_COOLDOWN, SEND_INTERVAL, SERVER_TIMEOUT, SERVER_URL,
 )
 from camera import Camera
 from detector import FaceDetector
 from extractor import FaceEmbedder
+from lock import Lock
 from models import ensure_models
 
-servo = AngularServo(SERVO_PIN, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, frame_width=3/1000)
-servo.value = 0
-GREEN_LED = LED(GREEN_LED_PIN)
-RED_LED = LED(RED_LED_PIN)
-UNLOCKED = False
+lock = Lock()
 
 YUNET_MODEL, SFACE_MODEL = ensure_models()
 
@@ -36,16 +29,9 @@ last_recognition_time = 0
 while True:
 
 	frame = camera.read()
-	if time.time() - last_sent > FAIL_COOLDOWN:
-		RED_LED.off()
+	lock.update()
 	if time.time() - last_recognition_time < RECOGNITION_COOLDOWN:
 		continue
-	else:
-		if UNLOCKED:
-			servo.angle=SERVO_LOCKED_ANGLE
-			GREEN_LED.off()
-			UNLOCKED = False
-		
 	face = detector.detect(frame)
 	if face is None:
 		continue
@@ -73,12 +59,11 @@ while True:
 				name = result.get("name")
 				similarity = result.get("similarity")
 				print(f"RECOGNIZED: {name}" f"{similarity:.4f}")
-				GREEN_LED.on()
-				servo.angle=SERVO_UNLOCKED_ANGLE
-				UNLOCKED = True
+				lock.unlock()
 			else:
-				RED_LED.blink(on_time=0.25,off_time=0.25)
+				lock.deny()
 		last_sent = now
 	except requests.RequestException as e:
 		print("Couldn't contact server:",e)
 camera.close()
+lock.close()

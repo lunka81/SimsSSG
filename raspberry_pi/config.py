@@ -44,6 +44,10 @@ FAIL_COOLDOWN = 2
 SERVO_PIN = 18
 GREEN_LED_PIN = 17
 RED_LED_PIN = 16
+# Servo pulse widths in seconds and the frame width of its PWM signal
+SERVO_MIN_PULSE = 0.5 / 1000
+SERVO_MAX_PULSE = 2.5 / 1000
+SERVO_FRAME_WIDTH = 3 / 1000
 # Servo angles for the locked and unlocked positions
 SERVO_LOCKED_ANGLE = 0
 SERVO_UNLOCKED_ANGLE = 90
