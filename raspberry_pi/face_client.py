@@ -4,6 +4,9 @@ import requests
 import time
 #from gpiozero import LED
 from gpiozero import AngularServo, LED
+
+from models import ensure_models
+
 servo = AngularServo(18, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, frame_width=3/1000)
 servo.value = 0
 GREEN_LED = LED(17)
@@ -15,16 +18,16 @@ RECOGNITION_COOLDOWN = 5
 FAIL_COOLDOWN = 2
 CAMERA_ID = 0
 SERVER_URL = "http://......:8000/recognize"
-YUNET_MODEL = "models/face_detection_yunet_2023mar.onnx"
-SFACE_MODEL = "models/face_recognition_sface_2021dec.onnx"
 
 DETECTION_THREASHOLD = 0.8
 
 SEND_INTERVAL = 1.0
 
+YUNET_MODEL, SFACE_MODEL = ensure_models()
+
 print("Loading Models")
 detector = cv2.FaceDetectorYN.create(
-YUNET_MODEL,
+str(YUNET_MODEL),
 "",
 (320,320),
 DETECTION_THREASHOLD,
@@ -33,7 +36,7 @@ DETECTION_THREASHOLD,
 print("Loading Sface")
 
 recognizer = cv2.FaceRecognizerSF.create(
-SFACE_MODEL,
+str(SFACE_MODEL),
 ""
 )
 
