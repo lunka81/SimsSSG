@@ -21,6 +21,9 @@ CAPTURE_WIDTH = 1980
 CAPTURE_HEIGHT = 1200
 
 # Face detection (OpenCV YuNet)
+# Detection runs on a copy of the frame scaled down to this width, which keeps large frames fast.
+# The face is then cropped from the full resolution frame for the embedding
+DETECT_WIDTH = 640
 # Faces with a lower detection score (0-1) are ignored
 DETECTION_THRESHOLD = 0.8
 # Non-maximum suppression threshold and max number of candidates kept before suppression
