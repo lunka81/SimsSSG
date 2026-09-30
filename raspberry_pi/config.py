@@ -44,3 +44,10 @@ RED_LED_PIN = 16
 # Servo angles for the locked and unlocked positions
 SERVO_LOCKED_ANGLE = 0
 SERVO_UNLOCKED_ANGLE = 90
+
+# Pixel format asked from the camera. Most USB cameras only reach high resolutions with MJPG
+CAPTURE_FOURCC = "MJPG"
+# A failed frame read is retried this many times (waiting READ_RETRY_DELAY seconds between
+# tries) before the camera is considered lost
+READ_RETRIES = 50
+READ_RETRY_DELAY = 0.1

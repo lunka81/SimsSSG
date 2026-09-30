@@ -6,11 +6,11 @@ import time
 from gpiozero import AngularServo, LED
 
 from config import (
-	CAMERA_INDEX, CAPTURE_HEIGHT, CAPTURE_WIDTH, DETECTION_THRESHOLD,
-	DEVICE_ID, FAIL_COOLDOWN, GREEN_LED_PIN, MIN_FACE_SIZE, NMS_THRESHOLD,
+	DETECTION_THRESHOLD, DEVICE_ID, FAIL_COOLDOWN, GREEN_LED_PIN, MIN_FACE_SIZE, NMS_THRESHOLD,
 	RECOGNITION_COOLDOWN, RED_LED_PIN, SEND_INTERVAL, SERVER_TIMEOUT,
 	SERVER_URL, SERVO_LOCKED_ANGLE, SERVO_PIN, SERVO_UNLOCKED_ANGLE, TOP_K,
 )
+from camera import Camera
 from models import ensure_models
 
 servo = AngularServo(SERVO_PIN, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, frame_width=3/1000)
@@ -38,13 +38,7 @@ str(SFACE_MODEL),
 
 print("Models Loaded")
 
-camera = cv2.VideoCapture(CAMERA_INDEX)
-
-if not camera.isOpened():
-	raise RuntimeError("Error Opening Camera")
-
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
+camera = Camera()
 
 print("Camera opened")
 
@@ -53,11 +47,7 @@ last_recognition_time = 0
 
 while True:
 
-	ret, frame = camera.read()
-	if not ret:
-		print("Couldn't read frame")
-		#time.sleep(0.1)
-		continue
+	frame = camera.read()
 	if time.time() - last_sent > FAIL_COOLDOWN:
 		RED_LED.off()
 	if time.time() - last_recognition_time < RECOGNITION_COOLDOWN:
@@ -123,5 +113,5 @@ while True:
 		except requests.RequestException as e:
 			print("Couldn't contact server:",e)
 		break
-camera.release()
+camera.close()
 
