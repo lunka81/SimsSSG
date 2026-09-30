@@ -5,23 +5,19 @@ import time
 #from gpiozero import LED
 from gpiozero import AngularServo, LED
 
+from config import (
+	CAMERA_INDEX, CAPTURE_HEIGHT, CAPTURE_WIDTH, DETECTION_THRESHOLD,
+	DEVICE_ID, FAIL_COOLDOWN, GREEN_LED_PIN, MIN_FACE_SIZE, NMS_THRESHOLD,
+	RECOGNITION_COOLDOWN, RED_LED_PIN, SEND_INTERVAL, SERVER_TIMEOUT,
+	SERVER_URL, SERVO_LOCKED_ANGLE, SERVO_PIN, SERVO_UNLOCKED_ANGLE, TOP_K,
+)
 from models import ensure_models
 
-servo = AngularServo(18, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, frame_width=3/1000)
+servo = AngularServo(SERVO_PIN, min_pulse_width=0.5/1000, max_pulse_width=2.5/1000, frame_width=3/1000)
 servo.value = 0
-GREEN_LED = LED(17)
-RED_LED = LED(16)
+GREEN_LED = LED(GREEN_LED_PIN)
+RED_LED = LED(RED_LED_PIN)
 UNLOCKED = False
-CAM_WIDTH = 1980
-CAM_HEIGHT = 1200
-RECOGNITION_COOLDOWN = 5
-FAIL_COOLDOWN = 2
-CAMERA_ID = 0
-SERVER_URL = "http://......:8000/recognize"
-
-DETECTION_THREASHOLD = 0.8
-
-SEND_INTERVAL = 1.0
 
 YUNET_MODEL, SFACE_MODEL = ensure_models()
 
@@ -30,9 +26,9 @@ detector = cv2.FaceDetectorYN.create(
 str(YUNET_MODEL),
 "",
 (320,320),
-DETECTION_THREASHOLD,
-0.3,
-5000)
+DETECTION_THRESHOLD,
+NMS_THRESHOLD,
+TOP_K)
 print("Loading Sface")
 
 recognizer = cv2.FaceRecognizerSF.create(
@@ -42,13 +38,13 @@ str(SFACE_MODEL),
 
 print("Models Loaded")
 
-camera = cv2.VideoCapture(CAMERA_ID)
+camera = cv2.VideoCapture(CAMERA_INDEX)
 
 if not camera.isOpened():
 	raise RuntimeError("Error Opening Camera")
 
-camera.set(cv2.CAP_PROP_FRAME_WIDTH, CAM_WIDTH)
-camera.set(cv2.CAP_PROP_FRAME_HEIGHT, CAM_HEIGHT)
+camera.set(cv2.CAP_PROP_FRAME_WIDTH, CAPTURE_WIDTH)
+camera.set(cv2.CAP_PROP_FRAME_HEIGHT, CAPTURE_HEIGHT)
 
 print("Camera opened")
 
@@ -68,7 +64,7 @@ while True:
 		continue
 	else:
 		if UNLOCKED:
-			servo.angle=0
+			servo.angle=SERVO_LOCKED_ANGLE
 			GREEN_LED.off()
 			UNLOCKED = False
 		
@@ -80,11 +76,11 @@ while True:
 	for face in faces:
 
 		confidence = float(face[-1])
-		if confidence < DETECTION_THREASHOLD:
+		if confidence < DETECTION_THRESHOLD:
 			continue
 		x,y,w,h = map(int, face[:4])
 		
-		if w<100 or h < 100:
+		if w < MIN_FACE_SIZE or h < MIN_FACE_SIZE:
 			continue
 		now = time.time()
 		if now - last_sent < SEND_INTERVAL:
@@ -99,7 +95,7 @@ while True:
 		embedding = embedding / norm
 		embedding = embedding.tolist()
 		payload = {
-			"camera_id":"raspberry-pi-01",
+			"camera_id":DEVICE_ID,
 			"timestamp":float(time.time()),
 			"detection_confidence":float(confidence),
 			"face_width":int(w),
@@ -109,7 +105,7 @@ while True:
 		if time.time() - last_recognition_time < RECOGNITION_COOLDOWN:
 			continue
 		try:
-			response = requests.post(SERVER_URL, json=payload,timeout=5)
+			response = requests.post(SERVER_URL, json=payload,timeout=SERVER_TIMEOUT)
 			if response.status_code == 200:
 				result = response.json()
 				print(result)
@@ -119,7 +115,7 @@ while True:
 					similarity = result.get("similarity")
 					print(f"RECOGNIZED: {name}" f"{similarity:.4f}")
 					GREEN_LED.on()
-					servo.angle=90
+					servo.angle=SERVO_UNLOCKED_ANGLE
 					UNLOCKED = True
 				else:
 					RED_LED.blink(on_time=0.25,off_time=0.25)

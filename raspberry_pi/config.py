@@ -5,3 +5,42 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent
 # Downloaded ONNX models
 MODELS_DIR = BASE_DIR / "models"
+
+# Name sent along with every request so the server knows which device it came from
+DEVICE_ID = "raspberry-pi-01"
+
+# Recognition server
+SERVER_URL = "http://......:8000/recognize"
+# Seconds to wait for the server before giving up
+SERVER_TIMEOUT = 5
+
+# Camera
+# Index of the camera, /dev/video<index> on Linux
+CAMERA_INDEX = 0
+CAPTURE_WIDTH = 1980
+CAPTURE_HEIGHT = 1200
+
+# Face detection (OpenCV YuNet)
+# Faces with a lower detection score (0-1) are ignored
+DETECTION_THRESHOLD = 0.8
+# Non-maximum suppression threshold and max number of candidates kept before suppression
+NMS_THRESHOLD = 0.3
+TOP_K = 5000
+# Faces smaller than this many pixels (width or height) are ignored
+MIN_FACE_SIZE = 100
+
+# Timing, in seconds
+# Minimum time between two requests to the server
+SEND_INTERVAL = 1.0
+# Pause after a successful server response before scanning again
+RECOGNITION_COOLDOWN = 5
+# How long the red LED stays on after a failed recognition
+FAIL_COOLDOWN = 2
+
+# GPIO (BCM pin numbers)
+SERVO_PIN = 18
+GREEN_LED_PIN = 17
+RED_LED_PIN = 16
+# Servo angles for the locked and unlocked positions
+SERVO_LOCKED_ANGLE = 0
+SERVO_UNLOCKED_ANGLE = 90
