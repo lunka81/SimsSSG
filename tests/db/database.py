@@ -1,0 +1,15 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase,sessionmaker
+from dotenv import load_dotenv
+class Base(DeclarativeBase):
+    pass
+
+
+load_dotenv()
+DATABASE_TEST_URL = os.getenv('DATABASE_TEST_URL').strip()
+engine = create_engine(DATABASE_TEST_URL)
+SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+def get_session():
+    with SessionLocal() as session:
+        yield session
