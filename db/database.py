@@ -13,3 +13,5 @@ SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 def get_session():
     with SessionLocal() as session:
         yield session
+    #"with" simplifies resource management.
+    #cleans up the session even if exception occurs.

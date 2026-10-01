@@ -16,7 +16,7 @@ class Employee(Base):
     __tablename__ = "employees"
 
     uuid: Mapped[UUID] = mapped_column(UUID4, primary_key=True)
-    embedding: Mapped[list[float]] = mapped_column(Vector(512), nullable=False)
+    embedding: Mapped[list[float]] = mapped_column(Vector(128), nullable=False)
     employee_logs: Mapped[list[EmployeeLog]] = relationship(
         back_populates="nearest_image",
         passive_deletes=True)
