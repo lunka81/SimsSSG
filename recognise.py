@@ -3,7 +3,7 @@ import numpy as np
 from insightface.app import FaceAnalysis
 
 app = FaceAnalysis(name="buffalo_l", allowed_modules=["detection", "recognition"])
-app.prepare(ctx_id=-1, det_size=(640, 640))
+app.prepare(ctx_id=-1, det_size=(320, 320))
 
 
 def cosine_similarity(a, b):
@@ -11,7 +11,7 @@ def cosine_similarity(a, b):
 
 
 reference = None
-reference_name = "nobody"
+reference_name = "Person"
 
 cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
 

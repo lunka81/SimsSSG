@@ -10,5 +10,11 @@ data/
 *.jpeg
 *.png
 *.mp4
+*.csv
 
 .vscode/
+
+illumination_samples/
+spoof_type_samples/
+sample_*.jpg
+*.zip.*
