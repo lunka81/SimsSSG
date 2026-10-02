@@ -15,6 +15,7 @@ data/
 .vscode/
 
 illumination_samples/
+
 spoof_type_samples/
 sample_*.jpg
 *.zip.*
