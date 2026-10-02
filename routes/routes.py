@@ -5,6 +5,8 @@ from db.database import get_session
 from sqlalchemy.orm import Session
 from pydantic import uuid4
 import services.services
+from models.employee import Employee, EmployeeLog
+from pydantic import Base64Bytes
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 

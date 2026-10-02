@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Base64Bytes
+from pydantic import BaseModel, Base64Bytes, ConfigDict
 from datetime import datetime
 
 import uuid
