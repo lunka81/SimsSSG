@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class Employee(Base):
-    __tablename__ = "employees"
+    __tablename__ = "employee"
 
     uuid: Mapped[UUID] = mapped_column(Uuid, primary_key=True, default=uuid4)
     embedding: Mapped[list[float]] = mapped_column(Vector(128), nullable=False)

@@ -3,9 +3,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from schemas.schemas import employee_response, employee_log_response, employee_create_request
 from db.database import get_session
 from sqlalchemy.orm import Session
-from pydantic import uuid4
-import services.services
-from models.employee import Employee, EmployeeLog
+from uuid import UUID
+from services import services
+from models.employee import Employee
 from pydantic import Base64Bytes
 
 router = APIRouter(prefix="/routes", tags=["routes"])
@@ -15,18 +15,26 @@ router = APIRouter(prefix="/routes", tags=["routes"])
 def get_employees(db : Session = Depends(get_session)):
     return services.get_employees(db)
 
-@router.post("/employee/{picture}", response_model=employee_create_request)
-def create_employee(picture : Base64Bytes, db : Session = Depends(get_session))
-    if picture.decode() == b"":
+@router.post("/employee", response_model=employee_response)
+def create_employee(payload : employee_create_request, db : Session = Depends(get_session)):
+    if not payload.picture:
         raise HTTPException(status_code=422, detail="Request contains no picture.")
-    return services.create_employee(picture, db)
+    return services.create_employee(payload.picture, db)
+
+
+
+@router.post("employee_log/{emp_id}", response_model = employee_log_response)
+def create_log(emp_id : UUID, session : Session = Depends(get_session)):
+    #this endpoint should never be reached unless a face can be tied to an id, so i don't think a check is necessary.
+    return services.create_employee_log(emp_id,)
 
 @router.delete("/employee/{emp_id}", status_code=status.HTTP_204_NO_CONTENT) 
-def delete_employee(emp_id : uuid4, db: Session = Depends(get_session)):
-    emp = db.get(Employee, emp_id)
+def delete_employee(emp_id : UUID, session: Session = Depends(get_session)):
+    emp = session.get(Employee, emp_id)
     if emp is None: 
         raise HTTPException(status_code=404, detail="Employee not found.")
-    return services.delete_employee(emp_id, db)
+    services.delete_employee(emp, session)
+
 
 
 '''

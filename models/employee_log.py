@@ -22,7 +22,7 @@ class EmployeeLog(Base):
     )
     employee_uuid: Mapped[UUID] = mapped_column(
         Uuid,
-        ForeignKey("employees.uuid", ondelete="CASCADE"),
+        ForeignKey("employee.uuid", ondelete="CASCADE"),
         nullable=False,
         index=True,
     )
