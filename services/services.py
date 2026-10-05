@@ -32,6 +32,6 @@ def create_employee_log(employee : Employee, session : Session) -> employee_log_
     return log
 
 def delete_employee(employee : Employee, session : Session):
-    session.delete(employee)
+    session.delete(employee)W
     session.commit()    
     

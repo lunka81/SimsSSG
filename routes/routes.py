@@ -10,7 +10,6 @@ from pydantic import Base64Bytes
 
 router = APIRouter(prefix="/routes", tags=["routes"])
 
-
 @router.get("/employee", response_model=list[employee_response])
 def get_employees(db : Session = Depends(get_session)):
     return services.get_employees(db)
@@ -20,8 +19,6 @@ def create_employee(payload : employee_create_request, db : Session = Depends(ge
     if not payload.picture:
         raise HTTPException(status_code=422, detail="Request contains no picture.")
     return services.create_employee(payload.picture, db)
-
-
 
 @router.post("employee_log/{emp_id}", response_model = employee_log_response)
 def create_log(emp_id : UUID, session : Session = Depends(get_session)):
