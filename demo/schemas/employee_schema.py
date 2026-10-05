@@ -3,6 +3,8 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field
 from demo.models.employee_test_log import EmployeeTestLog
 from demo.schemas.employee_log_schema import EmployeeLogResponse
+from datetime import datetime
+
 class EmployeeCreate(BaseModel):
     name: str
     img: str
@@ -13,6 +15,14 @@ class EmployeeResponse(BaseModel):
 
     uuid: UUID
     name: str
+
+class EmployeeLogResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    name: str
+    uuid: UUID
+    timestamp: datetime
+    approved: bool
 
 
 class EmployeeDetailResponse(EmployeeResponse):
