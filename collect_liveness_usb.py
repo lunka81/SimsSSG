@@ -5,7 +5,7 @@ import numpy as np
 import onnxruntime as ort
 from insightface.app import FaceAnalysis
 
-CONDITION = "bright_cutout_hand_usb"
+CONDITION = "face_mask_pic"
 SUBJECT = "fredrik"
 IS_ATTACK = True
 CAMERA_LABEL = "usb_camera"
