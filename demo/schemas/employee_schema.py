@@ -1,8 +1,8 @@
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
-from tests.models.employee_test_log import EmployeeLog
-
+from demo.models.employee_test_log import EmployeeTestLog
+from demo.schemas.employee_log_schema import EmployeeLogResponse
 class EmployeeCreate(BaseModel):
     name: str
     img: str
@@ -16,6 +16,6 @@ class EmployeeResponse(BaseModel):
 
 
 class EmployeeDetailResponse(EmployeeResponse):
-    employee_logs: list[EmployeeLog] = Field(
+    employee_logs: list[EmployeeLogResponse] = Field(
         default_factory=list
     )

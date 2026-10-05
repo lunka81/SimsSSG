@@ -2,9 +2,9 @@ from fastapi import APIRouter
 from fastapi.params import Depends
 from sqlalchemy.orm import Session
 
-from tests.db.database import get_session
-from tests.schemas.employee_schema import EmployeeResponse, EmployeeCreate
-from tests.services import employee_services
+from demo.db.database import get_session
+from demo.schemas.employee_schema import EmployeeResponse, EmployeeCreate
+from demo.services import employee_services
 
 employee_router = APIRouter(
     prefix="/api/employee",
