@@ -1,0 +1,6 @@
+# Face recognition client. Install with: pip install -r requirements.txt
+# OpenCV 4.8+ is needed for the YuNet 2023mar model
+opencv-python>=4.8
+numpy
+requests
+gpiozero; sys_platform == "linux"
