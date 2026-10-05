@@ -1,11 +1,15 @@
 import time
-from config import RECOGNITION_COOLDOWN, SEND_INTERVAL
+from config import RECOGNITION_COOLDOWN, SEND_INTERVAL, USE_HARDWARE_LOCK
 from camera import Camera
 from detector import FaceDetector
 from extractor import FaceEmbedder
-from lock import Lock
 from models import ensure_models
 from uploader import recognize
+
+if USE_HARDWARE_LOCK:
+	from lock import Lock
+else:
+	from fake_lock import FakeLock as Lock
 
 lock = Lock()
 

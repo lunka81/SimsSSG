@@ -40,6 +40,10 @@ RECOGNITION_COOLDOWN = 5
 # How long the red LED stays on after a failed recognition
 FAIL_COOLDOWN = 2
 
+# Set to False to run without the Pi hardware (e.g. on a PC): the lock is replaced by
+# FakeLock, which only prints what the servo and LEDs would do
+USE_HARDWARE_LOCK = True
+
 # GPIO (BCM pin numbers)
 SERVO_PIN = 18
 GREEN_LED_PIN = 17

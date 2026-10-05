@@ -1,5 +1,6 @@
 """Frame source: a USB/UVC camera."""
 
+import sys
 import time
 
 import cv2
@@ -16,7 +17,8 @@ from config import (
 
 class Camera:
     def __init__(self, index=CAMERA_INDEX, width=CAPTURE_WIDTH, height=CAPTURE_HEIGHT, fourcc=CAPTURE_FOURCC):
-        self.cap = cv2.VideoCapture(index, cv2.CAP_V4L2) if hasattr(cv2, "CAP_V4L2") else cv2.VideoCapture(index)
+        # V4L2 only exists on Linux; the constant is defined on every platform, so check the OS instead
+        self.cap = cv2.VideoCapture(index, cv2.CAP_V4L2) if sys.platform.startswith("linux") else cv2.VideoCapture(index)
         if not self.cap.isOpened():
             raise RuntimeError(f"Could not open camera {index}")
         self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*fourcc))

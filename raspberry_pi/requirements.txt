@@ -3,4 +3,6 @@
 opencv-python>=4.8
 numpy
 requests
+onnxruntime # liveness
+# Servo and LEDs, only needed on the Pi (see USE_HARDWARE_LOCK in config.py)
 gpiozero; sys_platform == "linux"
