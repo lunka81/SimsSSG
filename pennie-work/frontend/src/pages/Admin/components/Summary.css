@@ -1,0 +1,60 @@
+/*Lägger korten bredvid varandra*/
+.event-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+/*Gäller alla fyra korten*/
+.summary-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+.summary-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
+    color: #ff6a00;
+    background: rgba(255, 106, 0, 0.12);
+    border-radius: 10px;
+}
+
+/*Bara ikonrutan som har båda klasserna blir grön*/
+.summary-icon.approved {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.12);
+}
+
+.summary-value {
+    margin: 0;
+    font-size: 30px;
+    font-weight: bold;
+}
+
+.summary-label {
+    margin: 4px 0 0;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.summary-sub {
+    margin: 4px 0 0;
+    font-size: 12px;
+    color: #777;
+}
+
+/*Två kort per rad på smala skärmar*/
+@media (max-width: 900px) {
+    .event-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+}

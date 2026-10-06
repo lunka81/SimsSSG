@@ -7,7 +7,7 @@ class Base(DeclarativeBase):
 
 
 load_dotenv()
-DATABASE_TEST_URL = os.getenv('DATABASE_TEST_URL').strip()
+DATABASE_TEST_URL = os.getenv('DATABASE_URL').strip()
 engine = create_engine(DATABASE_TEST_URL)
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
 def get_session():

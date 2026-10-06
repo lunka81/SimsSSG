@@ -1,0 +1,95 @@
+.admin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*Så att rutan hamnar utanpå andra element */
+    z-index: 1000;
+}
+
+.admin-modal {
+    background: #080808;
+    color: black;
+    padding: 24px;
+    border: 1px solid #ff6a00;
+    border-radius: 12px;
+    width: min(90%, 360px);
+}
+
+.admin-modal h2 {
+    color: #ff6a00;
+    margin: 0;
+}
+
+.login-line {
+    width: 55px;
+    height: 4px;
+    margin-top: 10px;
+
+    background: #ff6a00;
+    border-radius: 10px;
+}
+
+.admin-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.admin-modal label {
+    display: flex;
+    flex-direction: column;
+    color: #aaa;
+    gap: 5px;
+    font-size: 14px;
+}
+
+.admin-modal input {
+    outline: none;
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    padding: 8px;
+}
+
+.admin-modal input:focus {
+    border: 1px solid #ff6a00;
+}
+
+.login-error {
+    color: red;
+    font-size: 14px;
+    margin: 0;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.login-button {
+    font-weight: bold;
+    color: white;
+    background: #ff6a00;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.login-button:hover {
+    background: #e55f00;
+}
+
+.cancel-button {
+    font-weight: bold;
+    color: white;
+    background: #080808;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+}

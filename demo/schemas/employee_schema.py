@@ -16,15 +16,6 @@ class EmployeeResponse(BaseModel):
     uuid: UUID
     name: str
 
-class EmployeeLogResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    name: str
-    uuid: UUID
-    timestamp: datetime
-    approved: bool
-
-
 class EmployeeDetailResponse(EmployeeResponse):
     employee_logs: list[EmployeeLogResponse] = Field(
         default_factory=list

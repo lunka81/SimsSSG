@@ -1,0 +1,92 @@
+.stored-toolbar {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.stored-persons input,
+.stored-persons select {
+    padding: 12px;
+    font-size: 14px;
+    color: white;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    outline: none;
+}
+
+.stored-persons input::placeholder {
+    color: #777;
+}
+
+.stored-persons input:focus,
+.stored-persons select:focus {
+    border-color: #ff6a00;
+}
+
+.table-wrapper {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    margin-top: 16px;
+
+    scrollbar-width: thin;
+    scrollbar-color: #ff6a00 transparent;
+}
+
+.stored-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.stored-table th {
+    position: sticky;
+    top: 0;
+    background: #080808;
+    padding: 10px 8px;
+    text-align: left;
+    color: #aaa;
+    font-weight: bold;
+}
+
+.stored-table td {
+    padding: 10px 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stored-table td,
+.stored-table th {
+    white-space: nowrap;
+}
+
+.person-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: #222;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.icon-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    color: white;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    border-color: #ff6a00;
+    color: #ff6a00;
+}

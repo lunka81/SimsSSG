@@ -36,5 +36,6 @@ class EmployeeTest(Base):
     )
 
     employee_logs: Mapped[list["EmployeeTestLog"]] = relationship(
-        back_populates="employee"
+        back_populates="employee",
+        cascade="all, delete-orphan"
     )

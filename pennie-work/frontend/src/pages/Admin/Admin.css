@@ -1,0 +1,65 @@
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.app {
+    flex: 1;
+    min-width: 0;
+}
+
+.content {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.logout-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    color: white;
+    background: #ff6a00;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.mid-content{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-top: 16px;
+}
+
+.add-person,
+.stored-persons {
+    padding: 20px;
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+.stored-persons {
+    display: flex;
+    flex-direction: column;
+    contain: size;
+}
+
+.add-person h2,
+.stored-persons h2 {
+    margin: 0;
+}
+
+@media (max-width: 1100px) {
+    .mid-content {
+        grid-template-columns: 1fr;
+    }
+
+    .stored-persons {
+        contain: none;
+    }
+
+    .table-wrapper {
+        max-height: 400px;
+    }
+}

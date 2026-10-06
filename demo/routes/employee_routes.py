@@ -1,5 +1,5 @@
-from fastapi import APIRouter
-from fastapi.params import Depends
+from fastapi import APIRouter, Depends, HTTPException, status
+
 from sqlalchemy.orm import Session
 from uuid import UUID
 from demo.db.database import get_session
@@ -26,4 +26,12 @@ def compare_employee(employee: EmployeeCreate, session: Session = Depends(get_se
 @employee_router.post("/employee_log/{emp_id}", response_model=EmployeeLogResponse)
 def create_employee_log(emp_id: UUID, approved: bool, session: Session = Depends(get_session)):
     emp = session.get(EmployeeTest, emp_id)
-    return employee_services.create_employee_log(session, emp_id, approved)
+    return employee_services.create_employee_log(session, emp, approved)
+
+@employee_router.delete("/{emp_id}", status_code=204)
+def delete_employee(emp_id: UUID, session: Session = Depends(get_session)):
+    emp = session.get(EmployeeTest, emp_id)
+    if emp is None: #if id isn't found cached or in db
+        raise HTTPException(status_code=404, detail="Employee not found.")
+    session.delete(emp)
+    session.commit()
