@@ -1,11 +1,14 @@
+from typing import Literal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
-from demo.models.employee_test_log import EmployeeTestLog
-from demo.schemas.employee_log_schema import EmployeeLogResponse
+
+
 class EmployeeCreate(BaseModel):
-    name: str
-    img: str
+    name: str = Field(min_length=1)
+    img: str = Field(min_length=1)
+    role: Literal["Standard", "Admin", "Limited"]
+    description: str | None = None
 
 
 class EmployeeResponse(BaseModel):
@@ -13,9 +16,3 @@ class EmployeeResponse(BaseModel):
 
     uuid: UUID
     name: str
-
-
-class EmployeeDetailResponse(EmployeeResponse):
-    employee_logs: list[EmployeeLogResponse] = Field(
-        default_factory=list
-    )

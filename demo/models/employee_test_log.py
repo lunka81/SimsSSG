@@ -26,10 +26,10 @@ class EmployeeTestLog(Base):
         nullable=False
     )
 
-    employee_uuid: Mapped[UUID] = mapped_column(
+    employee_uuid: Mapped[UUID | None] = mapped_column(
         Uuid,
         ForeignKey("employees.uuid"),
-        nullable=False,
+        nullable=True,
         index=True
     )
 
@@ -39,6 +39,6 @@ class EmployeeTestLog(Base):
         nullable=False
     )
 
-    employee: Mapped["EmployeeTest"] = relationship(
+    employee: Mapped["EmployeeTest | None"] = relationship(
         back_populates="employee_logs"
     )

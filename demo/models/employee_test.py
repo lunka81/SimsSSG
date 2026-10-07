@@ -17,7 +17,8 @@ class EmployeeTest(Base):
     uuid: Mapped[UUID] = mapped_column(
         Uuid,
         primary_key=True,
-        default=uuid4
+        default=uuid4,
+        nullable=False,
     )
 
     embedding: Mapped[list[float]] = mapped_column(
@@ -34,6 +35,17 @@ class EmployeeTest(Base):
         String,
         nullable=False
     )
+
+    role: Mapped[str] = mapped_column(
+        String,
+        nullable=False
+    )
+
+    description: Mapped[str | None] = mapped_column(
+        String,
+        nullable=True,
+    )
+
 
     employee_logs: Mapped[list["EmployeeTestLog"]] = relationship(
         back_populates="employee"
