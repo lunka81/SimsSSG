@@ -1,8 +1,0 @@
-# Face recognition client. Install with: pip install -r requirements.txt
-# OpenCV 4.8+ is needed for the YuNet 2023mar model
-opencv-python>=4.8
-numpy~=2.4.6
-requests~=2.34.2
-onnxruntime~=1.30.0
-# Servo and LEDs, only needed on the Pi (see USE_HARDWARE_LOCK in config.py)
-gpiozero; sys_platform == "linux"

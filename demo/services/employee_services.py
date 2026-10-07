@@ -1,21 +1,24 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 
-from demo.models import employee_test
+from uuid import UUID
+
 from demo.models.employee_test import EmployeeTest
 from demo.models.employee_test_log import EmployeeTestLog
-from demo.schemas.employee_schema import EmployeeCreate, EmployeeResponse, EmployeeLogResponse
-from demo.services.img_services import decode_image_to_bgr
+from demo.schemas.employee_schema import EmployeeCreate, EmployeeResponse, EmployeeDetailResponse, EmployeeLogResponse
+from demo.services.img_services import decode_image_to_bgr, get_embedding
+
 
 def add_employee(session: Session, employee_create:EmployeeCreate)->EmployeeResponse:
     img_bytes, bgr = decode_image_to_bgr(employee_create.img)
-    embedding = get_embedding(employee_create.img)
-
-    #employee = EmployeeTest(**employee_create.model_dump())
+    embedding = get_embedding(bgr)
 
     employee = EmployeeTest(
-        employee_create.name,
-        employee_create.img, 
-        embedding
+        embedding=embedding,
+        image=img_bytes,
+        name=employee_create.name,
+        permission=employee_create.permission,
+        description=employee_create.description,
     )
 
     session.add(employee)
@@ -29,9 +32,12 @@ def create_employee_log(session: Session, employee : EmployeeTest, access_grante
     employee.employee_logs.append(log)
     session.commit()
     session.refresh(log)
-    return EmployeeLogResponse(
-        name=employee.name,
-        uuid=log.uuid,
-        timestamp=log.timestamp,
-        approved=log.approved,
-    )
+    return EmployeeLogResponse.model_validate(log)
+
+def get_employees(session: Session) -> list[EmployeeResponse]:
+    employees = session.scalars(select(EmployeeTest).order_by(EmployeeTest.name)).all()
+    return employees
+
+def get_employee_details(session: Session, emp_id: UUID) -> EmployeeDetailResponse:
+    emp = session.get(EmployeeTest, emp_id)
+    return emp

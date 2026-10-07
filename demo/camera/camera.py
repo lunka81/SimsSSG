@@ -11,7 +11,7 @@ def generate_camera_frames(cap):
             if not ok:
                 break
 
-            # Gör bildrutan till JPEG-bytes
+            # Turns the frame into JPEG bytes
             ok, encoded = cv2.imencode(".jpg", frame)
 
             if not ok:

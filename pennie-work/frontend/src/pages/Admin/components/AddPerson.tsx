@@ -2,14 +2,17 @@ import "./AddPerson.css";
 import type { SubmitEvent } from "react";
 import { useState } from "react";
 import { Camera } from "lucide-react";
+import { createEmployee, fileToDataUrl, type Employee, type Permission } from "../../../api";
 
-// Tar emot en funktion från Admin som lägger till personen i listan
+// Tar emot en funktion från Admin som lägger till den sparade personen i listan
 type AddPersonProps = {
-    onAdd: (name: string, access: string, department: string) => void;
+    onAdd: (employee: Employee) => void;
 };
 
 function AddPerson({ onAdd }: AddPersonProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [error, setError] = useState("");
+    const [saving, setSaving] = useState(false);
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
 
@@ -18,25 +21,50 @@ function AddPerson({ onAdd }: AddPersonProps) {
             setImagePreview(imageUrl);
         }
     }
-    function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+    async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
-        const formData = new FormData(e.currentTarget);
-        const name = formData.get("name") as string;
-        const access = formData.get("access") as string;
-        const description = formData.get("description") as string;
+        // Sparas innan await, eftersom e.currentTarget blir null efteråt
+        const form = e.currentTarget;
+        const formData = new FormData(form);
+        const name = (formData.get("name") as string).trim();
+        const permission = formData.get("access") as Permission;
+        const description = (formData.get("description") as string).trim();
+        const picture = formData.get("picture") as File;
 
-        // Namn är obligatoriskt
+        // Namn och bild är obligatoriska
         if (!name) {
+            setError("Name is required");
+            return;
+        }
+        if (!picture || picture.size === 0) {
+            setError("Profile picture is required");
             return;
         }
 
-        onAdd(name, access, description);
-        // Tömmer formuläret
-        e.currentTarget.reset();
+        setError("");
+        setSaving(true);
+        try {
+            const employee = await createEmployee({
+                name: name,
+                permission: permission,
+                // Tom beskrivning skickas som null
+                description: description || null,
+                img: await fileToDataUrl(picture),
+            });
+            onAdd(employee);
+            // Tömmer formuläret
+            form.reset();
+            setImagePreview(null);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : "Could not save person");
+        } finally {
+            setSaving(false);
+        }
     }
 
     function handleCancel() {
         setImagePreview(null);
+        setError("");
     }
 
     return (
@@ -82,9 +110,13 @@ function AddPerson({ onAdd }: AddPersonProps) {
                     </div>
                 </div>
 
+                {error && <p className="login-error">{error}</p>}
+
                 <div className="add-person-buttons">
                     <button type="reset" className="cancel-button" onClick={handleCancel}>Cancel</button>
-                    <button type="submit" className="login-button">Add person</button>
+                    <button type="submit" className="login-button" disabled={saving}>
+                        {saving ? "Saving..." : "Add person"}
+                    </button>
                 </div>
             </form>
         </section>

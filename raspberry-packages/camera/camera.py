@@ -1,0 +1,55 @@
+"""Frame source: a USB/UVC camera."""
+
+import sys
+import time
+
+import cv2
+
+from config.config import (
+    CAMERA_INDEX,
+    CAPTURE_FOURCC,
+    CAPTURE_HEIGHT,
+    CAPTURE_WIDTH,
+    READ_RETRIES,
+    READ_RETRY_DELAY,
+)
+
+
+class Camera:
+    def __init__(
+            self,
+            index=CAMERA_INDEX,
+            width=CAPTURE_WIDTH,
+            height=CAPTURE_HEIGHT,
+            fourcc=CAPTURE_FOURCC,
+    ):
+        if sys.platform.startswith("linux"):
+            self.cap = cv2.VideoCapture(index, cv2.CAP_V4L2)
+        elif sys.platform == "win32":
+            self.cap = cv2.VideoCapture(index, cv2.CAP_MSMF)
+        else:
+            self.cap = cv2.VideoCapture(index)
+
+        if not self.cap.isOpened():
+            self.cap.release()
+            raise RuntimeError(f"Could not open camera {index}")
+
+        self.cap.set(
+            cv2.CAP_PROP_FOURCC,
+            cv2.VideoWriter_fourcc(*fourcc),
+        )
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+    def read(self):
+        """Return the next frame (BGR). Retries failed reads, raises RuntimeError if the camera stays silent."""
+        for _ in range(READ_RETRIES):
+            ok, frame = self.cap.read()
+            if ok:
+                return frame
+            print("Couldn't read frame")
+            time.sleep(READ_RETRY_DELAY)
+        raise RuntimeError("Camera stopped delivering frames")
+
+    def close(self):
+        self.cap.release()

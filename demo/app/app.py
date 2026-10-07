@@ -6,16 +6,33 @@ from starlette.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Header, HTTPException
 from demo.routes.camera_routes import camera_router
 from demo.routes.employee_routes import employee_router
+from demo.routes.recognition_routes import recognition_router
+
+from contextlib import asynccontextmanager
+from sqlalchemy import text
+
+from demo.db.database import Base, engine
+import demo.models.employee_test      # models must be imported so Base knows about them
+import demo.models.employee_test_log
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    with engine.begin() as conn:
+        conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+    Base.metadata.create_all(engine)
+    yield
 
 load_dotenv()
-app = FastAPI(debug=os.getenv("DEBUG", "False").lower() == "true")
+app = FastAPI(lifespan=lifespan, debug=os.getenv("DEBUG", "False").lower() == "true")
+#app = FastAPI(lifespan=lifespan, debug=os.getenv("DEBUG", "False").lower() == "true")
 app.include_router(camera_router)
 app.include_router(employee_router)
+app.include_router(recognition_router)
 
 '''
-React kör på port 5173 och FastAPI på en annan port.
-Webbläsaren betraktar dem därför som olika origins och kräver
-att backend uttryckligen tillåter anrop från React-adressen.
+React runs on port 5173 and FastAPI on a different port.
+The browser therefore treats them as different origins and requires
+the backend to explicitly allow requests from the React address.
 '''
 app.add_middleware(
     CORSMiddleware,

@@ -1,46 +1,66 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { isLoggedIn } from "../../auth";
+import { deleteEmployee, getEmployees, type Employee } from "../../api";
 import Header from "./components/Header";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
 import Sidebar from "./components/Sidebar";
 import StoredPersons, { type Person } from "./components/StoredPersons";
+import EmployeeDetails from "./components/EmployeeDetails";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
 import "./Admin.css";
 
-// Tillfälliga testpersoner tills listan hämtas från databasen
-const testPersons: Person[] = [
-  { id: 1, name: "Anna Svensson", access: "Standard", department: "Production", active: true },
-  { id: 2, name: "Erik Johansson", access: "Admin", department: "IT", active: true },
-  { id: 3, name: "Lisa Karlsson", access: "Limited", department: "Visitor", active: true },
-  { id: 4, name: "Johan Nilsson", access: "Standard", department: "Maintenance", active: false },
-];
+// Gör om en person från backenden till det format som tabellen använder
+function toPerson(employee: Employee): Person {
+  return {
+    id: employee.uuid,
+    name: employee.name,
+    access: employee.permission,
+    department: employee.description ?? "",
+    // Finns inte i databasen än, så alla visas som aktiva
+    active: true,
+  };
+}
 
 function Admin() {
   // Admin äger listan och delar ut den till AddPerson och StoredPersons
-  const [persons, setPersons] = useState(testPersons);
+  const [persons, setPersons] = useState<Person[]>([]);
+  // uuid för personen vars detaljer visas, null när rutan är stängd
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+
+  // Hämtar alla personer från databasen när sidan öppnas
+  useEffect(() => {
+    getEmployees()
+      .then((employees) => setPersons(employees.map(toPerson)))
+      .catch((err) => console.error("Could not load persons:", err));
+  }, []);
+
+  // useCallback så att EmployeeDetails inte lägger till sin Escape-lyssnare på nytt vid varje rendering
+  const closeDetails = useCallback(() => setSelectedId(null), []);
 
   if (!isLoggedIn()) {
     return <Navigate to="/" replace />;
   }
 
-  // Anropas av AddPerson när man klickar "Add person"
-  function addPerson(name: string, access: string, department: string) {
-    const newPerson: Person = {
-      id: Date.now(),
-      name: name,
-      access: access,
-      department: department,
-      active: true,
-    };
+  // Anropas av AddPerson när backenden har sparat personen
+  function addPerson(employee: Employee) {
     // Skapar en ny lista med alla gamla personer och den nya sist
-    setPersons([...persons, newPerson]);
+    setPersons([...persons, toPerson(employee)]);
   }
 
-  function deletePerson(id: number) {
-    // Behåller alla personer utom den med detta id
-    setPersons(persons.filter((person) => person.id !== id));
+  // Anropas av StoredPersons när man har bekräftat borttagningen
+  async function deletePerson(id: string) {
+    try {
+      // Tar bort personen i databasen först, så att listan bara ändras om det lyckades
+      await deleteEmployee(id);
+    } catch (err) {
+      window.alert(err instanceof Error ? err.message : "Could not remove person");
+      return;
+    }
+    // Behåller alla personer utom den med detta id.
+    // prev används eftersom listan kan ha ändrats medan vi väntade på backenden
+    setPersons((prev) => prev.filter((person) => person.id !== id));
   }
 
   return (
@@ -84,10 +104,11 @@ function Admin() {
 
           <div className="mid-content">
             <AddPerson onAdd={addPerson} />
-            <StoredPersons persons={persons} onDelete={deletePerson} />
+            <StoredPersons persons={persons} onDelete={deletePerson} onSelect={setSelectedId} />
           </div>
         </div>
       </main>
+      {selectedId && <EmployeeDetails uuid={selectedId} onClose={closeDetails} />}
     </div>
   );
 }

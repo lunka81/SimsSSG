@@ -1,10 +1,12 @@
 import "./StoredPersons.css";
 import { Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { employeeImageUrl } from "../../../api";
 
 // Beskriver hur en person ser ut. export så att Admin kan använda den
 export type Person = {
-    id: number;
+    // uuid från databasen
+    id: string;
     name: string;
     access: string;
     department: string;
@@ -14,10 +16,12 @@ export type Person = {
 type StoredPersonsProps = {
     //array av personer som ska visas i tabellen
     persons: Person[];
-    onDelete: (id: number) => void;
+    onDelete: (id: string) => void;
+    // Anropas när man klickar på en rad i tabellen
+    onSelect: (id: string) => void;
 };
 
-function StoredPersons({ persons, onDelete }: StoredPersonsProps) {
+function StoredPersons({ persons, onDelete, onSelect }: StoredPersonsProps) {
     const [search, setSearch] = useState("");
     const [permission, setPermission] = useState("all");
 
@@ -70,15 +74,16 @@ function StoredPersons({ persons, onDelete }: StoredPersonsProps) {
                     <tbody>
                         {/*Går igenom alla personer i arrayen och skapar en tabellrad för varje person*/}
                         {filteredPersons.map((person) => (
-                            <tr key={person.id}>
-                                <td><div className="person-picture"></div></td>
+                            <tr key={person.id} className="clickable-row" onClick={() => onSelect(person.id)}>
+                                <td><img className="person-picture" src={employeeImageUrl(person.id)} alt="" /></td>
                                 <td>{person.name}</td>
                                 <td>{person.access}</td>
                                 <td>{person.department}</td>
                                 {/*Om personen är aktive===true, returnera Active, annars returnera Inactive*/}
                                 <td>{person.active ? "Active" : "Inactive"}</td>
                                 <td>
-                                    <div className="action-buttons">
+                                    {/*Klick på knapparna ska inte också öppna personens detaljer*/}
+                                    <div className="action-buttons" onClick={(e) => e.stopPropagation()}>
                                         <button type="button" className="icon-button" title="Edit">
                                             <Pencil size={16} />
                                         </button>
