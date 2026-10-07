@@ -30,10 +30,10 @@ SERVER_TIMEOUT = 5
 # Camera
 # Index of the camera, /dev/video<index> on Linux
 CAMERA_INDEX = 0
-CAPTURE_WIDTH = 640
-CAPTURE_HEIGHT = 480
-#CAPTURE_WIDTH = 1980
-#CAPTURE_HEIGHT = 1200
+#CAPTURE_WIDTH = 640
+#CAPTURE_HEIGHT = 480
+CAPTURE_WIDTH = 1980
+CAPTURE_HEIGHT = 1200
 
 # Face detection (OpenCV YuNet)
 # Detection runs on a copy of the frame scaled down to this width, which keeps large frames fast.
