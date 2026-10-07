@@ -2,23 +2,26 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 
+from config import LIVENESS_THRESHOLD
+from models import LIVENESS_V1SE_FILE, LIVENESS_V2_FILE
+
 SIZE = 80
 LIVE_INDEX = 1
 
 MODELS = [
-    ("v2", "models/2.7_80x80_MiniFASNetV2.onnx", 2.7),
-    ("v1se", "models/4_0_0_80x80_MiniFASNetV1SE.onnx", 4.0),
+    ("v2", LIVENESS_V2_FILE, 2.7),
+    ("v1se", LIVENESS_V1SE_FILE, 4.0),
 ]
 
 
 class LivenessChecker:
-    def __init__(self, model_paths=None, threshold=0.5):
+    def __init__(self, model_paths=None, threshold=LIVENESS_THRESHOLD):
         self.threshold = threshold
         self.sessions = []
 
         for tag, path, scale in (model_paths or MODELS):
             sess = ort.InferenceSession(
-                path, providers=["CPUExecutionProvider"]
+                str(path), providers=["CPUExecutionProvider"]
             )
             self.sessions.append((tag, sess, sess.get_inputs()[0].name, scale))
 

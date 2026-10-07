@@ -32,6 +32,10 @@ TOP_K = 5000
 # Faces smaller than this many pixels (width or height) are ignored
 MIN_FACE_SIZE = 100
 
+# Liveness (MiniFASNet anti-spoofing)
+# Faces with a lower live score (0-1) are treated as spoofs (photo, screen) and not sent to the server
+LIVENESS_THRESHOLD = 0.5
+
 # Timing, in seconds
 # Minimum time between two requests to the server
 SEND_INTERVAL = 1.0
