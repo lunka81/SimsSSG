@@ -1,6 +1,6 @@
 .add-person-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 24px;
     margin-top: 20px;
 }
@@ -29,6 +29,8 @@
 
 .add-person input,
 .add-person select {
+    width: 100%;
+    min-width: 0;
     padding: 12px;
     font-size: 14px;
     color: white;
@@ -112,8 +114,8 @@
     gap: 12px;
 }
 
-@media (max-width: 600px) {
+@container (max-width: 500px) {
     .add-person-form {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }

@@ -46,7 +46,7 @@ function AdminLogin({ onClose }: AdminLoginProps) {
                             Login
                         </button>
                         {/*När någon trycker på knappen anropas onClose-funktionen*/}
-                        <button onClick={onClose} className="cancel-button">
+                        <button type="button" onClick={onClose} className="cancel-button">
                             Cancel
                         </button>
                     </div>

@@ -33,6 +33,7 @@ function AddPerson({ onAdd }: AddPersonProps) {
         onAdd(name, access, description);
         // Tömmer formuläret
         e.currentTarget.reset();
+        setImagePreview(null);
     }
 
     function handleCancel() {

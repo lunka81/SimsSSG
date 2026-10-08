@@ -30,6 +30,7 @@
     min-height: 0;
     overflow-y: auto;
     margin-top: 16px;
+    overflow-x: auto;
 
     scrollbar-width: thin;
     scrollbar-color: #ff6a00 transparent;

@@ -1,41 +1,56 @@
+import "./Sidebar.css";
+import { logout } from "../../../auth";
+import { useNavigate, NavLink } from "react-router-dom";
+import { LogOut } from "lucide-react";
 import {
     House,
     Users,
     ClipboardList,
-    ChartNoAxesColumn,
 } from "lucide-react";
 
-import "./Sidebar.css";
-
 function Sidebar() {
+    const navigate = useNavigate();
+    function handleLogout() {
+        logout();
+        navigate("/");
+    }
     return (
         <aside className="sidebar">
             <div className="sidebar-logo">
-                SSG<span>•</span>
+                SSG
             </div>
 
             <nav className="sidebar-nav">
-                <button className="sidebar-item active">
+                <NavLink
+                    to="/admin"
+                    end
+                    className="sidebar-item"
+                >
                     <House size={20} />
-                    <span>Översikt</span>
-                </button>
+                    <span>Overview</span>
+                </NavLink>
 
-                <button className="sidebar-item">
+                <NavLink
+                    to="/admin/persons"
+                    className="sidebar-item"
+                >
                     <Users size={20} />
-                    <span>Personer</span>
-                </button>
+                    <span>Persons</span>
+                </NavLink>
 
-                <button className="sidebar-item">
+                <NavLink
+                    to="/admin/logbook"
+                    className="sidebar-item"
+                >
                     <ClipboardList size={20} />
-                    <span>Loggbok</span>
-                </button>
-
-                <button className="sidebar-item">
-                    <ChartNoAxesColumn size={20} />
-                    <span>Statistik</span>
-                </button>
+                    <span>Logbook</span>
+                </NavLink>
             </nav>
-        </aside>
+            <button type="button" className="sidebar-item logout-button" onClick={handleLogout}>
+                <LogOut size={20} />
+                <span>Log out</span>
+            </button>
+        </aside >
     );
 }
 

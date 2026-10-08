@@ -46,7 +46,7 @@
 }
 
 .result-card.approved .result-icon {
-  background: #ff6a00;
+  background: #43a047;
 }
 
 .result-card.approved .result-divider {
@@ -54,12 +54,12 @@
 }
 
 .result-card.approved h2 span {
-  color: #ff6a00;
+  color: #43a047;
 }
 
 /*denied*/
 .result-card.denied {
-  border-color: #e53935;
+  border-color: #ff6a00;
 }
 
 .result-card.denied .result-icon {
@@ -67,7 +67,7 @@
 }
 
 .result-card.denied .result-divider {
-  background: #e53935;
+  background: #ff6a00;
 }
 
 .result-card.denied h2 span {

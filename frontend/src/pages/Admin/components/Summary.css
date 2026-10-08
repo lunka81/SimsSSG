@@ -53,7 +53,7 @@
 }
 
 /*Två kort per rad på smala skärmar*/
-@media (max-width: 900px) {
+@container (max-width: 800px) {
     .event-summary {
         grid-template-columns: 1fr 1fr;
     }

@@ -59,7 +59,6 @@ function StoredPersons({ persons, onDelete }: StoredPersonsProps) {
                     <thead>
                         <tr>
                             {/*Kolumnrubriker för tabellen*/}
-                            <th>Picture</th>
                             <th>Name</th>
                             <th>Permission</th>
                             <th>Description</th>
@@ -71,7 +70,6 @@ function StoredPersons({ persons, onDelete }: StoredPersonsProps) {
                         {/*Går igenom alla personer i arrayen och skapar en tabellrad för varje person*/}
                         {filteredPersons.map((person) => (
                             <tr key={person.id}>
-                                <td><div className="person-picture"></div></td>
                                 <td>{person.name}</td>
                                 <td>{person.access}</td>
                                 <td>{person.department}</td>

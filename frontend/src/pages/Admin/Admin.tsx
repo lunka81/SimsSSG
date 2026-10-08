@@ -1,10 +1,7 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { isLoggedIn } from "../../auth";
 import Header from "./components/Header";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
-import Sidebar from "./components/Sidebar";
 import StoredPersons, { type Person } from "./components/StoredPersons";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
 import "./Admin.css";
@@ -20,10 +17,6 @@ const testPersons: Person[] = [
 function Admin() {
   // Admin äger listan och delar ut den till AddPerson och StoredPersons
   const [persons, setPersons] = useState(testPersons);
-
-  if (!isLoggedIn()) {
-    return <Navigate to="/" replace />;
-  }
 
   // Anropas av AddPerson när man klickar "Add person"
   function addPerson(name: string, access: string, department: string) {
@@ -44,9 +37,6 @@ function Admin() {
   }
 
   return (
-    <div className="admin-layout">
-      <Sidebar />
-      <main className="app">
         <div className="content">
           <Header />
 
@@ -87,8 +77,6 @@ function Admin() {
             <StoredPersons persons={persons} onDelete={deletePerson} />
           </div>
         </div>
-      </main>
-    </div>
   );
 }
 

@@ -12,12 +12,6 @@
   color: #ff6a00;
 }
 
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
 .header-line {
   width: 55px;
   height: 4px;
