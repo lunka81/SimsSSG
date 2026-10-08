@@ -2,6 +2,7 @@ from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field, FiniteFloat
+from demo.schemas.employee_schema import EmployeeResponse
 
 class ComparisonRequest(BaseModel):
     camera_id: str
@@ -22,3 +23,6 @@ class ComparisonResponse(BaseModel):
 class ComparisonDetailResponse(ComparisonResponse):
     #används för 
     confidence: float
+
+class NearestNeighbourResponse(EmployeeResponse):
+    confidence : FiniteFloat
