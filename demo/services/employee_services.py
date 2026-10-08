@@ -27,13 +27,6 @@ def add_employee(session: Session, employee_create:EmployeeCreate)->EmployeeResp
     employee_response = EmployeeResponse.model_validate(employee)
     return employee_response
 
-def create_employee_log(session: Session, employee : EmployeeTest, access_granted: bool) -> EmployeeLogResponse:
-    log = EmployeeTestLog(approved = access_granted)
-    employee.employee_logs.append(log)
-    session.commit()
-    session.refresh(log)
-    return EmployeeLogResponse.model_validate(log)
-
 def get_employees(session: Session) -> list[EmployeeResponse]:
     employees = session.scalars(select(EmployeeTest).order_by(EmployeeTest.name)).all()
     return employees

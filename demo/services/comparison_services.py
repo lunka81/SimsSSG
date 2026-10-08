@@ -1,13 +1,14 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import select
 from fastapi import HTTPException
 from pydantic import FiniteFloat
-from demo.schemas.comparison_schema import ComparisonDetailResponse, ComparisonResponse, NearestNeighbourResponse
+from demo.schemas.comparison_schema import NearestNeighbour, ComparisonResponse
 from demo.services.employee_log_services import create_employee_log
 import os
 import secrets
 from demo.models.employee_test import EmployeeTest
 
-def validate_api_key(api_key: str) -> bool:
+def validate_api_key(api_key: str | None) -> None:
     expected_key = os.environ["DEVICE_API_KEY"]
     if api_key is None or not secrets.compare_digest(
         api_key, expected_key
@@ -17,42 +18,52 @@ def validate_api_key(api_key: str) -> bool:
             detail="Invalid API key"
         )
 
-def find_nearest_employee(session: Session, embedding: list[FiniteFloat]) -> NearestNeighbourResponse:
-    """
-        TODO:
-            Test implementera detta med pgvector's inbyggda 
-            nearest neighbour-funktioner.
-    """
-    pass
 
-def get_compare_response(session: Session, nearest_neighbour : NearestNeighbourResponse) -> ComparisonResponse:
-    #placeholder threshhold
-    CONFIDENCE_THRESHHOLD = 0.80
-    if nearest_neighbour.confidence >= CONFIDENCE_THRESHHOLD:
+def find_nearest_neighbour(session: Session, vector: list[FiniteFloat]) -> NearestNeighbour | None:
 
-        
-        
-        """
-            Changed the NearestNeighbour Schema, 
-            neighbour.employee.x doesn't work anymore
-        """
-        employee = session.get(EmployeeTest, nearest_neighbour.employee.uuid)
-        
-        #sufficient confidence in employee match -> employee gets a new log.
-        
-        #TODO: Invalid call
-        create_employee_log(employee, session) 
+    distance = EmployeeTest.embedding.cosine_distance(vector)
+    nearest_neighbour = session.execute(
+        select(
+            EmployeeTest.uuid, 
+            EmployeeTest.name,
+            distance.label("distance")
+        ).order_by(distance).limit(1)
+    ).first()
+
+    if nearest_neighbour is not None:
+        uuid, name, dist = nearest_neighbour
+        similarity = 1 - dist
+
+        return NearestNeighbour(
+            uuid=uuid,
+            name=name,
+            similarity=similarity
+        )
+    
+    #employee table is empty.
+    return None
+
+OPENCV_REC_THRESHHOLD = 0.363
+
+
+def get_compare_response(session: Session, nearest_neighbour : NearestNeighbour | None) -> ComparisonResponse:
+    if nearest_neighbour is None: #employee table is empty.
         return ComparisonResponse(
-            approved=True,
-            employee_uuid=nearest_neighbour.employee.uuid,
-            name=nearest_neighbour.employee.name
+            approved=False
         )
 
-    #confidence not high enough -> comparison isn't tied to nearest employee.
+    approved = nearest_neighbour.similarity >= OPENCV_REC_THRESHHOLD
+    if approved:
+        employee = session.get(EmployeeTest, nearest_neighbour.uuid)
+        #a log is created in relation to the employee who got granted access.
+        log = create_employee_log(session, employee, approved)
+
     return ComparisonResponse(
-        approved=False,
-        employee_uuid=None,
-        name=None
+        approved=approved,
+        employee_uuid=nearest_neighbour.uuid if approved else None,
+        name=nearest_neighbour.name if approved else None
     )
+
+
 
     

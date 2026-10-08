@@ -5,3 +5,5 @@ __pycache__/
 *.pyc
 *.exe
 .idea/workspace.xml
+*.onnx
+test_identify.py

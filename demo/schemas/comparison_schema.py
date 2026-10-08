@@ -15,14 +15,12 @@ class ComparisonRequest(BaseModel):
         max_length=128,
     )
 
+class NearestNeighbour(BaseModel):
+    uuid: UUID
+    name: str
+    similarity: float
+
 class ComparisonResponse(BaseModel):
     approved: bool
     employee_uuid: UUID | None = None
     name: str | None = None
-
-class ComparisonDetailResponse(ComparisonResponse):
-    #används för 
-    confidence: float
-
-class NearestNeighbourResponse(EmployeeResponse):
-    confidence : FiniteFloat
