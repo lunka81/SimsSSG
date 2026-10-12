@@ -3,11 +3,15 @@ from uuid import UUID
 from demo.schemas.employee_schema import EmployeeCreate
 class AdminCreate(EmployeeCreate):
     username: str
-    hash_password: str #ändra detta till hash-typen
+    plain_password: str 
+
+class AdminLogin(BaseModel):
+    username: str
+    password: str
 
 class AdminResponse(BaseModel):
     username: str
     uuid: UUID
 
 class AdminLoginResponse(AdminResponse):
-    approved: bool
+    access_token: str #str?

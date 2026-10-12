@@ -7,13 +7,16 @@ from fastapi import FastAPI, Header, HTTPException
 from demo.routes.camera_routes import camera_router
 from demo.routes.employee_routes import employee_router
 from demo.routes.recognition_routes import recognition_router
+from demo.routes.admin_login_routes import login_router
 
 from contextlib import asynccontextmanager
 from sqlalchemy import text
 
 from demo.db.database import Base, engine
-import demo.models.employee_test      # models must be imported so Base knows about them
+#Models must be imported so Base knows about them.
+import demo.models.employee_test      
 import demo.models.employee_test_log
+import demo.models.admin
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -28,6 +31,7 @@ app = FastAPI(lifespan=lifespan, debug=os.getenv("DEBUG", "False").lower() == "t
 app.include_router(camera_router)
 app.include_router(employee_router)
 app.include_router(recognition_router)
+app.include_router(login_router)
 
 '''
 React runs on port 5173 and FastAPI on a different port.

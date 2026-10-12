@@ -10,6 +10,7 @@ from demo.db.database import Base
 
 if TYPE_CHECKING:
     from demo.models.employee_test_log import EmployeeTestLog
+    from demo.models.admin import Admin
 
 
 class Permission(str, enum.Enum):
@@ -57,6 +58,11 @@ class EmployeeTest(Base):
     )
 
     employee_logs: Mapped[list["EmployeeTestLog"]] = relationship(
+        back_populates="employee",
+        cascade="all, delete-orphan"
+    )
+
+    admin: Mapped["Admin | None"] = relationship(
         back_populates="employee",
         cascade="all, delete-orphan"
     )
