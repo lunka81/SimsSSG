@@ -1,25 +1,17 @@
 import cv2
 
+from camera.camera import Camera
 from config.config import CAMERA_INDEX
 
 
 def main():
-    cap = cv2.VideoCapture(CAMERA_INDEX, cv2.CAP_MSMF)
+    camera = Camera()
 
     try:
-        if not cap.isOpened():
-            raise RuntimeError(
-                f"Kunde inte öppna kamera {CAMERA_INDEX}"
-            )
-
         print("Visar kameraflödet. Tryck Q i bildfönstret för att avsluta.")
 
         while True:
-            ok, frame = cap.read()
-
-            if not ok:
-                print("Kunde inte läsa nästa bildruta")
-                break
+            frame = camera.read()
 
             cv2.imshow(f"Kamera {CAMERA_INDEX}", frame)
 
@@ -27,7 +19,7 @@ def main():
                 break
 
     finally:
-        cap.release()
+        camera.close()
         cv2.destroyAllWindows()
 
 

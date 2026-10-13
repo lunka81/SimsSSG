@@ -5,15 +5,14 @@ from datetime import datetime, timezone
 from camera.camera import Camera
 from clients.uploader import recognize
 from config.config import (
-    MODELS_DIR,
     RECOGNITION_COOLDOWN,
     SEND_INTERVAL,
     USE_HARDWARE_LOCK,
 )
-from models.models import ensure_models
 from recognition.detector import FaceDetector
 from recognition.extractor import FaceEmbedder
 from recognition.liveness import LivenessChecker
+from recognition.model_files import ensure_models
 
 
 class RecognitionService:
@@ -115,21 +114,7 @@ class RecognitionService:
             detector = FaceDetector(detector_path)
             embedder = FaceEmbedder(recognizer_path)
 
-            # Dessa filer måste redan finnas i MODELS_DIR.
-            liveness = LivenessChecker(
-                model_paths=[
-                    (
-                        "v2",
-                        str(MODELS_DIR / "2.7_80x80_MiniFASNetV2.onnx"),
-                        2.7,
-                    ),
-                    (
-                        "v1se",
-                        str(MODELS_DIR / "4_0_0_80x80_MiniFASNetV1SE.onnx"),
-                        4.0,
-                    ),
-                ]
-            )
+            liveness = LivenessChecker()
 
             lock = Lock()
 
