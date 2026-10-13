@@ -8,15 +8,19 @@ from demo.schemas.employee_schema import (
     EmployeeDetailResponse, 
     EmployeeCreate
 )
+
+from demo.services.auth_services import verify_access_token
                                         
 from demo.services import employee_services
 
 from demo.models.employee_test import EmployeeTest
 from demo.services.img_services import image_media_type
 
+#a token has to be sent with every request to these endpoints,
+#in order to verify the admin's identity. 
 employee_router = APIRouter(
     prefix="/api/employee",
-    tags=["employee"]
+    dependencies=[Depends(verify_access_token)]
 )
 
 @employee_router.get("/", response_model=list[EmployeeResponse])

@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from demo.db.database import get_session
 from demo.schemas.admin_schema import AdminResponse, AdminLoginResponse, AdminCreate, AdminLogin
-from demo.services.admin_services import verify_login_details, add_admin, create_access_token, username_unique
+from demo.services.admin_services import add_admin, username_unique
+from demo.services.auth_services import create_access_token, verify_login_details, verify_access_token
 login_router = APIRouter(
     prefix="/auth",
     tags=["auth"]

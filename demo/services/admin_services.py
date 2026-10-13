@@ -10,21 +10,6 @@ from pwdlib import PasswordHash
 password_hasher = PasswordHash.recommended()
 #perhaps add functionality to promote an employee to admin (without creating a new employee entity)
 
-def verify_login_details(session: Session, login_details: AdminLogin) -> Admin | None:
-    admin = session.scalars(
-        select(
-            Admin
-        ).where(
-            Admin.username==login_details.username
-        )
-    ).first()
-
-    #1. checks if username exists
-    #2. hashes the entered password and compares it with the stored hash.
-    if admin is None or (not password_hasher.verify(login_details.password, admin.password_hash)):
-        return None
-    return admin
-
 def username_unique(session: Session, username: str) -> bool:
     admin = session.scalars(
             select(
@@ -56,5 +41,3 @@ def add_admin(session: Session, admin: AdminCreate) -> AdminResponse:
         uuid=new_admin.uuid
     )
 
-def create_access_token(admin: Admin) -> str:
-    pass
