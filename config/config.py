@@ -4,34 +4,25 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-#BASE_DIR = Path(__file__).parent
-# Downloaded ONNX models
 BASE_DIR = Path(__file__).resolve().parents[1]
 load_dotenv(BASE_DIR / ".env")
 
-# Modellfiler hålls separat från Python-package models.
+# Downloaded ONNX models
 MODELS_DIR = BASE_DIR / "model_weights"
 
+# Name sent along with every request so the server knows which device it came from
 DEVICE_ID = os.environ["DEVICE_ID"]
 DEVICE_API_KEY = os.environ["DEVICE_API_KEY"]
 
+# Recognition server
 BACKEND_URL = os.environ["BACKEND_URL"].rstrip("/")
 SERVER_URL = f"{BACKEND_URL}/recognition/identify"
-SERVER_TIMEOUT = 5
-
-# Name sent along with every request so the server knows which device it came from
-#DEVICE_ID = "raspberry-pi-01"
-
-# Recognition server
-#SERVER_URL = "http://......:8000/recognize"
 # Seconds to wait for the server before giving up
-#SERVER_TIMEOUT = 5
+SERVER_TIMEOUT = 5
 
 # Camera
 # Index of the camera, /dev/video<index> on Linux
 CAMERA_INDEX = 0
-#CAPTURE_WIDTH = 640
-#CAPTURE_HEIGHT = 480
 CAPTURE_WIDTH = 1980
 CAPTURE_HEIGHT = 1200
 

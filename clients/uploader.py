@@ -1,8 +1,7 @@
 """Send face embeddings to the recognition server and return its answer."""
 
 import requests
-from config.config import DEVICE_API_KEY
-from config.config import DEVICE_ID, SERVER_TIMEOUT, SERVER_URL
+from config.config import DEVICE_API_KEY, DEVICE_ID, SERVER_TIMEOUT, SERVER_URL
 
 
 def recognize(face, embedding, timestamp):

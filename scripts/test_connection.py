@@ -1,25 +1,19 @@
-import os
-from pathlib import Path
+import requests
 
-import httpx
-from dotenv import load_dotenv
-
-load_dotenv(Path(__file__).resolve().parent / ".env")
-
-url = os.environ["BACKEND_URL"].rstrip("/")
+from config.config import BACKEND_URL, DEVICE_API_KEY, SERVER_TIMEOUT
 
 try:
-    response = httpx.get(
-        f"{url}/device/ping",
+    response = requests.get(
+        f"{BACKEND_URL}/device/ping",
         headers={
-            "X-API-Key": os.environ["DEVICE_API_KEY"]
+            "X-API-Key": DEVICE_API_KEY
         },
-        timeout=5
+        timeout=SERVER_TIMEOUT
     )
 
     print("HTTP-status:", response.status_code)
     print("Svar:", response.text)
     response.raise_for_status()
 
-except httpx.HTTPError as error:
+except requests.RequestException as error:
     print("Anropet misslyckades:", error)

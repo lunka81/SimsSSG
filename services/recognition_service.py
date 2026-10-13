@@ -5,15 +5,14 @@ from datetime import datetime, timezone
 from camera.camera import Camera
 from clients.uploader import recognize
 from config.config import (
-    MODELS_DIR,
     RECOGNITION_COOLDOWN,
     SEND_INTERVAL,
     USE_HARDWARE_LOCK,
 )
-from models.models import ensure_models
 from recognition.detector import FaceDetector
 from recognition.extractor import FaceEmbedder
 from recognition.liveness import LivenessChecker
+from recognition.model_files import ensure_models
 
 
 class RecognitionService:
