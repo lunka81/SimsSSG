@@ -115,21 +115,7 @@ class RecognitionService:
             detector = FaceDetector(detector_path)
             embedder = FaceEmbedder(recognizer_path)
 
-            # Dessa filer måste redan finnas i MODELS_DIR.
-            liveness = LivenessChecker(
-                model_paths=[
-                    (
-                        "v2",
-                        str(MODELS_DIR / "2.7_80x80_MiniFASNetV2.onnx"),
-                        2.7,
-                    ),
-                    (
-                        "v1se",
-                        str(MODELS_DIR / "4_0_0_80x80_MiniFASNetV1SE.onnx"),
-                        4.0,
-                    ),
-                ]
-            )
+            liveness = LivenessChecker()
 
             lock = Lock()
 

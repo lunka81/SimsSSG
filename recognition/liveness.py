@@ -3,7 +3,7 @@ import numpy as np
 import onnxruntime as ort
 
 from config.config import LIVENESS_THRESHOLD
-from models import LIVENESS_V1SE_FILE, LIVENESS_V2_FILE
+from models.models import LIVENESS_V1SE_FILE, LIVENESS_V2_FILE
 
 SIZE = 80
 LIVE_INDEX = 1
