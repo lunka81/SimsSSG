@@ -46,7 +46,7 @@ def verify_access_token(
     #jwt.decode checks if signature computed with SECRET_KEY matches with the one in the token,
     #and if the token is expired.
     try:
-        payload = jwt.decode(credentials, SECRET_KEY, algorithms=["HS256"])
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=["HS256"])
         #if decode works, the token is valid. 
         #get the id of the admin it belongs to.
         admin_uuid = UUID(payload["sub"])
