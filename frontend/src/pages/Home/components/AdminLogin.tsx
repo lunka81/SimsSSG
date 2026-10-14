@@ -11,17 +11,22 @@ type AdminLoginProps = {
 function AdminLogin({ onClose }: AdminLoginProps) {
     const [error, setError] = useState("");
     const navigate = useNavigate();
-    {/*Hindrar sidan från att ladda om*/ }
-    function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+    async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
+        //Hindrar sidan från att ladda om
         e.preventDefault();
         //samlar ihop användarnamn och lösenord från formuläret i en lista
         const formData = new FormData(e.currentTarget);
         //talar om för typescript att det är en sträng som hämtas från formuläret
         const username = formData.get("username") as string;
         const password = formData.get("password") as string;
-        //funktionsanrop till login-funktionen i auth.ts som returnerar true eller false beroende på om användarnamn och lösenord är korrekt
-        if (!login(username, password)) {
-            setError("Wrong username or password");
+        //skickar uppgifterna till backend, som svarar om de stämmer
+        try {
+            if (!(await login(username, password))) {
+                setError("Wrong username or password");
+                return;
+            }
+        } catch {
+            setError("Could not reach the server. Please try again.");
             return;
         }
         navigate("/admin");

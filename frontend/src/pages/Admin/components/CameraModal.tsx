@@ -13,7 +13,7 @@ function CameraModal({ onCapture, onClose }: CameraModalProps) {
   const cameraRef = useRef<CameraHandle>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  useEffect(() => { 
     const dialog = dialogRef.current;
 
     if (dialog && !dialog.open) {

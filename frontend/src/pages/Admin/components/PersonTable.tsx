@@ -2,7 +2,6 @@ import "./PersonTable.css";
 import PersonDetails from "./PersonDetails";
 import { Search, Funnel, ChevronDown, ArrowUp, ArrowDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
-import type { EmployeeUpdate } from "../../../api/employees";
 
 // Beskriver hur en person ser ut. export så att Admin kan använda den
 export type Person = {
@@ -10,31 +9,22 @@ export type Person = {
     name: string;
     access: string;
     department: string;
-    active: boolean;
-    createdAt: string;
 };
 
 type PersonTableProps = {
     //array av personer som ska visas i tabellen
     persons: Person[];
-    onUpdate: (id: string, changes: EmployeeUpdate) => Promise<void>;
     onDelete: (id: string) => Promise<void>;
 };
 
-type SortKey = "name" | "access" | "department" | "active" | "createdAt";
+type SortKey = "name" | "access" | "department";
 type SortDirection = "asc" | "desc";
 
 // Antal personer per sida
 const PAGE_SIZE = 10;
 
-// Gör om "2026-10-12T10:15:00+02:00" till "2026-10-12"
-function formatDate(date: string) {
-    return new Date(date).toLocaleDateString("sv-SE");
-}
-
-function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
+function PersonTable({ persons, onDelete }: PersonTableProps) {
     const [search, setSearch] = useState("");
-    const [status, setStatus] = useState("all");
     const [permission, setPermission] = useState("all");
     const [department, setDepartment] = useState("all");
     const [sortKey, setSortKey] = useState<SortKey | null>(null);
@@ -52,35 +42,23 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
         // Söker bara på namn
         const matchesSearch = person.name.toLowerCase().includes(search.toLowerCase());
 
-        const matchesStatus =
-            status === "all" || (status === "active" ? person.active : !person.active);
-
         const matchesPermission =
             permission === "all" || person.access === permission;
 
         const matchesDepartment =
             department === "all" || person.department === department;
 
-        return matchesSearch && matchesStatus && matchesPermission && matchesDepartment;
+        return matchesSearch && matchesPermission && matchesDepartment;
     });
 
-    // Sorterar de filtrerade personerna. [...] gör en kopia så att originallistan inte ändras
-    const sortedPersons = [...filteredPersons].sort((a, b) => {
-        // senast tillagda överst
-        if (sortKey === null) {
-            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        }
-
-        let result;
-
-        if (sortKey === "createdAt") {
-            result = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-        } else {
-            result = String(a[sortKey]).localeCompare(String(b[sortKey]), "sv");
-        }
-
-        return sortDirection === "asc" ? result : -result;
-    });
+    // Sorterar de filtrerade personerna. [...] gör en kopia så att originallistan inte ändras.
+    // Ingen vald kolumn: personerna visas i den ordning backend skickar dem (sorterade på namn)
+    const sortedPersons = sortKey === null
+        ? filteredPersons
+        : [...filteredPersons].sort((a, b) => {
+            const result = a[sortKey].localeCompare(b[sortKey], "sv");
+            return sortDirection === "asc" ? result : -result;
+        });
 
     // Räknar ut hur många sidor det blir och vilka personer som syns på aktuell sida
     const totalPages = Math.max(1, Math.ceil(sortedPersons.length / PAGE_SIZE));
@@ -105,10 +83,9 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
         return sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
     }
 
-    // Återställer sökning och alla filter
+    // Återställer sökning, filter och sortering
     function clearFilters() {
         setSearch("");
-        setStatus("all");
         setPermission("all");
         setDepartment("all");
         setSortKey(null);
@@ -131,23 +108,12 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
 
                 {/*Varje filter är en ruta med en liten rubrik ovanför valet*/}
                 <label className="person-table-filter">
-                    <span>Status</span>
-                    <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }}>
-                        <option value="all">All</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                    </select>
-                    <ChevronDown size={16} className="filter-arrow" />
-                </label>
-
-                <label className="person-table-filter">
                     <span>Permission</span>
                     <select value={permission} onChange={(e) => { setPermission(e.target.value); setPage(1); }}>
                         <option value="all">All</option>
                         <option value="Standard">Standard</option>
                         <option value="Admin">Admin</option>
                         <option value="Limited">Limited</option>
-                        <option value="Guest">Guest</option>
                     </select>
                     <ChevronDown size={16} className="filter-arrow" />
                 </label>
@@ -191,16 +157,6 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
                                         Department {sortIcon("department")}
                                     </button>
                                 </th>
-                                <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("active")}>
-                                        Status {sortIcon("active")}
-                                    </button>
-                                </th>
-                                <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("createdAt")}>
-                                        Added {sortIcon("createdAt")}
-                                    </button>
-                                </th>
                             </tr>
                         </thead>
                         <tbody>
@@ -210,9 +166,6 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
                                     <td>{person.name}</td>
                                     <td>{person.access}</td>
                                     <td>{person.department}</td>
-                                    {/*Om personen är aktive===true, returnera Active, annars returnera Inactive*/}
-                                    <td>{person.active ? "Active" : "Inactive"}</td>
-                                    <td>{formatDate(person.createdAt)}</td>
                                 </tr>
                             ))}
                         </tbody>
@@ -254,7 +207,6 @@ function PersonTable({ persons, onUpdate, onDelete }: PersonTableProps) {
                 <PersonDetails
                     person={selectedPerson}
                     onClose={() => setSelectedId(null)}
-                    onUpdate={onUpdate}
                     onDelete={onDelete}
                 />
             )}

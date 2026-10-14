@@ -1,5 +1,4 @@
 import type { ReactNode } from "react";
-import PersonTable from "./PersonTable";
 import "./Summary.css";
 
 type SummaryProps = {

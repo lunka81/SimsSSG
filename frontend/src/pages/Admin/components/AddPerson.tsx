@@ -1,6 +1,7 @@
 import "./AddPerson.css";
+import AdminCredentialsModal from "./AdminCredentialsModal";
 import type { SubmitEvent } from "react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Camera } from "lucide-react";
 import CameraModal from "./CameraModal";
 
@@ -13,13 +14,32 @@ type AddPersonProps = {
         department: string,
         image: string,
     ) => Promise<void>;
+
+    onAddAdmin: (
+        name: string,
+        access: string,
+        department: string,
+        image: string,
+        username: string,
+        password: string,
+    ) => Promise<void>;
 };
 
-function AddPerson({ onAdd }: AddPersonProps) {
+type PendingAdmin = {
+    name: string;
+    access: string;
+    description: string;
+    image: string;
+};
+
+function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [cameraOpen, setCameraOpen] = useState(false);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [pendingAdmin, setPendingAdmin] = useState<PendingAdmin | null>(null);
+    const formRef = useRef<HTMLFormElement>(null);
+
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -51,6 +71,12 @@ function AddPerson({ onAdd }: AddPersonProps) {
             return;
         }
 
+        if (access === "Admin") {
+            setError(null);
+            setPendingAdmin({ name, access, description, image: imagePreview });
+            return;
+        }
+
         setSaving(true);
         setError(null);
 
@@ -69,6 +95,26 @@ function AddPerson({ onAdd }: AddPersonProps) {
         }
     }
 
+    async function handleAdminConfirm(username: string, password: string): Promise<void> {
+        if (pendingAdmin === null) return;
+        await onAddAdmin(
+            pendingAdmin.name,
+            pendingAdmin.access,
+            pendingAdmin.description,
+            pendingAdmin.image,
+            username,
+            password
+        );
+
+        formRef.current?.reset();
+        setImagePreview(null);
+        setPendingAdmin(null);
+    }
+
+    function handleAdminClose() {
+        setPendingAdmin(null);
+    }
+
     function handleCancel() {
         setImagePreview(null);
         setError(null);
@@ -79,7 +125,7 @@ function AddPerson({ onAdd }: AddPersonProps) {
         <section className="add-person">
             <h2>Add new person</h2>
 
-            <form className="add-person-form" onSubmit={handleSubmit}>
+            <form className="add-person-form" ref={formRef} onSubmit={handleSubmit}>
                 <div className="add-person-fields">
                     <label>
                         <span>
@@ -95,7 +141,6 @@ function AddPerson({ onAdd }: AddPersonProps) {
                             <option value="Standard">Standard</option>
                             <option value="Admin">Admin</option>
                             <option value="Limited">Limited</option>
-                            <option value="Guest">Guest</option>
                         </select>
                     </label>
                     <label>
@@ -163,6 +208,12 @@ function AddPerson({ onAdd }: AddPersonProps) {
                     onClose={() => setCameraOpen(false)}
                 />
             )}
+            {pendingAdmin && (
+                <AdminCredentialsModal
+                    personName={pendingAdmin.name}
+                    onConfirm={handleAdminConfirm}
+                    onClose={handleAdminClose}
+                />)}
         </section>
     );
 }

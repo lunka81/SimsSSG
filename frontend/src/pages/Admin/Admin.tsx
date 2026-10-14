@@ -1,6 +1,7 @@
 import Header from "./components/Header";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
+import { registerAdmin } from "../../auth";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
 import { createEmployee, getEmployees } from "../../api/employees";
 import "./Admin.css";
@@ -25,17 +26,43 @@ function Admin() {
     if (
       access !== "Standard" &&
       access !== "Admin" &&
-      access !== "Limited" &&
-      access !== "Guest"
+      access !== "Limited"
     ) {
       throw new Error("Invalid permission.");
     }
 
     await createEmployee({
       name,
-      role: access,
+      permission: access,
       description,
       img: image,
+    });
+    setRegPersons((previous) => (previous === null ? null : previous + 1));
+  }
+
+  async function handleAddAdmin(
+    name: string,
+    access: string,
+    description: string,
+    image: string,
+    username: string,
+    password: string,
+  ): Promise<void> {
+    if (
+      access !== "Standard" &&
+      access !== "Admin" &&
+      access !== "Limited"
+    ) {
+      throw new Error("Invalid permission.");
+    }
+
+    await registerAdmin({
+      name,
+      permission: access,
+      description,
+      img: image,      
+      username,
+      plain_password: password,
     });
     setRegPersons((previous) => (previous === null ? null : previous + 1));
   }
@@ -77,7 +104,7 @@ function Admin() {
       </div>
 
       <div className="mid-content">
-        <AddPerson onAdd={handleAddPerson} />
+        <AddPerson onAdd={handleAddPerson} onAddAdmin={handleAddAdmin}/>
       </div>
     </div>
   );

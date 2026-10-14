@@ -1,19 +1,16 @@
 import { useEffect, useRef, useState } from "react";
-import { X, Copy, Pencil, Trash2 } from "lucide-react";
+import { X, Copy, Trash2 } from "lucide-react";
 import type { Person } from "./PersonTable";
 import {
   getEmployeeDetails,
-  getEmployeeImageUrl,
-  type EmployeeDetails,
-  type EmployeeUpdate,
-  type Permission,
+  getEmployeeImage,
+  type EmployeeLog,
 } from "../../../api/employees";
 import "./PersonDetails.css";
 
 type PersonDetailsProps = {
   person: Person;
   onClose: () => void;
-  onUpdate: (id: string, changes: EmployeeUpdate) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
 };
 
@@ -22,18 +19,13 @@ function formatDateTime(date: string) {
   return new Date(date).toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" });
 }
 
-function PersonDetails({ person, onClose, onUpdate, onDelete }: PersonDetailsProps) {
+function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [details, setDetails] = useState<EmployeeDetails | null>(null);
+  // Personens passager från backend. null tills svaret har kommit
+  const [logs, setLogs] = useState<EmployeeLog[] | null>(null);
+  // Lokal adress (blob:...) till bilden. null tills bilden har hämtats
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  // true när man redigerar, false när man bara tittar
-  const [editing, setEditing] = useState(false);
-
-  // Värdena i redigeringsfälten. Börjar med personens nuvarande värden
-  const [name, setName] = useState(person.name);
-  const [access, setAccess] = useState(person.access);
-  const [department, setDepartment] = useState(person.department);
 
   // Öppnar rutan när komponenten visas
   useEffect(() => {
@@ -42,55 +34,49 @@ function PersonDetails({ person, onClose, onUpdate, onDelete }: PersonDetailsPro
     return () => dialog?.close();
   }, []);
 
-  // Hämtar statistiken för personen
+  // Hämtar personens passager
   useEffect(() => {
-    getEmployeeDetails(person.id).then(setDetails).catch(console.error);
+    getEmployeeDetails(person.id)
+      .then((details) => setLogs(details.employee_logs))
+      .catch(console.error);
   }, [person.id]);
 
-  // Gemensam hjälpfunktion: visar att något sparas och fångar fel
-  async function run(action: () => Promise<void>) {
-    setSaving(true);
-    try {
-      await action();
-    } catch (error) {
-      alert(error instanceof Error ? error.message : "Something went wrong.");
-    } finally {
-      setSaving(false);
-    }
-  }
+  // Hämtar bilden med token och tar bort den lokala adressen när popupen stängs
+  useEffect(() => {
+    let url: string | null = null;
+    getEmployeeImage(person.id)
+      .then((objectUrl) => {
+        url = objectUrl;
+        setImageUrl(objectUrl);
+      })
+      .catch(console.error);
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+  }, [person.id]);
 
-  function toggleStatus() {
-    run(() => onUpdate(person.id, { active: !person.active }));
-  }
+  // Räknar fram statistiken från passagerna
+  const approvedCount = logs?.filter((log) => log.approved).length ?? 0;
+  const deniedCount = logs?.filter((log) => !log.approved).length ?? 0;
+  // Den senaste passagen: störst tidpunkt i millisekunder
+  const lastSeen = logs && logs.length > 0
+    ? logs.reduce((latest, log) =>
+        new Date(log.timestamp).getTime() > new Date(latest.timestamp).getTime() ? log : latest
+      ).timestamp
+    : null;
 
-  // Fyller fälten med de senaste värdena och går till redigeringsläget
-  function startEditing() {
-    setName(person.name);
-    setAccess(person.access);
-    setDepartment(person.department);
-    setEditing(true);
-  }
-
-  function saveChanges() {
-    if (!name.trim()) {
-      alert("Name is required.");
-      return;
-    }
-    run(async () => {
-      await onUpdate(person.id, {
-        name: name.trim(),
-        role: access as Permission,
-        description: department.trim(),
-      });
-      setEditing(false);
-    });
-  }
-
-  function deletePerson() {
+  async function deletePerson() {
     if (!window.confirm(`Do you want to remove ${person.name}? This cannot be undone.`)) {
       return;
     }
-    run(() => onDelete(person.id));
+    setSaving(true);
+    try {
+      await onDelete(person.id);
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Could not remove the person.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -104,23 +90,18 @@ function PersonDetails({ person, onClose, onUpdate, onDelete }: PersonDetailsPro
     >
       <div className="person-details-content">
         <div className="person-details-header">
-          {editing ? (
-            <input
-              className="person-details-input"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              aria-label="Name"
-            />
-          ) : (
-            <h2>{person.name}</h2>
-          )}
+          <h2>{person.name}</h2>
           <button type="button" className="icon-button" title="Close" onClick={onClose}>
             <X size={16} />
           </button>
         </div>
 
         <div className="person-details-body">
-          <img src={getEmployeeImageUrl(person.id)} alt={person.name} className="person-details-image" />
+          {imageUrl ? (
+            <img src={imageUrl} alt={person.name} className="person-details-image" />
+          ) : (
+            <div className="person-details-image" />
+          )}
 
           <dl className="person-details-info">
             <dt>ID</dt>
@@ -137,83 +118,24 @@ function PersonDetails({ person, onClose, onUpdate, onDelete }: PersonDetailsPro
             </dd>
 
             <dt>Permission</dt>
-            <dd>
-              {editing ? (
-                <select
-                  className="person-details-input"
-                  value={access}
-                  onChange={(e) => setAccess(e.target.value)}
-                  aria-label="Permission"
-                >
-                  <option value="Standard">Standard</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Limited">Limited</option>
-                  <option value="Guest">Guest</option>
-                </select>
-              ) : (
-                person.access
-              )}
-            </dd>
+            <dd>{person.access}</dd>
 
             <dt>Department</dt>
-            <dd>
-              {editing ? (
-                <input
-                  className="person-details-input"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  aria-label="Department"
-                />
-              ) : (
-                person.department || "–"
-              )}
-            </dd>
-
-            <dt>Added</dt>
-            <dd>{formatDateTime(person.createdAt)}</dd>
-
-            <dt>Status</dt>
-            <dd>
-              <label className="status-toggle">
-                <input type="checkbox" checked={person.active} onChange={toggleStatus} disabled={saving} />
-                <span className="status-toggle-slider" />
-                {person.active ? "Active" : "Inactive"}
-              </label>
-            </dd>
+            <dd>{person.department || "–"}</dd>
 
             <dt>Last seen</dt>
-            <dd>{details?.last_seen ? formatDateTime(details.last_seen) : "Never"}</dd>
+            <dd>{logs === null ? "Loading..." : lastSeen ? formatDateTime(lastSeen) : "Never"}</dd>
 
             <dt>Entries</dt>
-            <dd>
-              {details ? `${details.approved_count} approved, ${details.denied_count} denied` : "Loading..."}
-            </dd>
+            <dd>{logs === null ? "Loading..." : `${approvedCount} approved, ${deniedCount} denied`}</dd>
           </dl>
         </div>
 
-        {/*Knapparna längst ner. Olika knappar beroende på om man redigerar eller inte*/}
         <div className="person-details-footer">
-          {editing ? (
-            <>
-              <button type="button" className="button-secondary" onClick={() => setEditing(false)} disabled={saving}>
-                Cancel
-              </button>
-              <button type="button" className="button-primary" onClick={saveChanges} disabled={saving}>
-                {saving ? "Saving..." : "Save changes"}
-              </button>
-            </>
-          ) : (
-            <>
-              <button type="button" className="button-danger" onClick={deletePerson} disabled={saving}>
-                <Trash2 size={16} />
-                Delete
-              </button>
-              <button type="button" className="button-primary" onClick={startEditing} disabled={saving}>
-                <Pencil size={16} />
-                Edit
-              </button>
-            </>
-          )}
+          <button type="button" className="button-danger" onClick={deletePerson} disabled={saving}>
+            <Trash2 size={16} />
+            {saving ? "Removing..." : "Delete"}
+          </button>
         </div>
       </div>
     </dialog>

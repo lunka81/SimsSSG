@@ -40,7 +40,7 @@
 /*Sökfältet, filtren och knappen på en rad*/
 .person-table-toolbar {
     display: grid;
-    grid-template-columns: minmax(200px, 2fr) repeat(3, minmax(140px, 1fr)) auto;
+    grid-template-columns: minmax(200px, 2fr) repeat(2, minmax(140px, 1fr)) auto;
     gap: 12px;
     padding: 16px;
     background: #080808;
