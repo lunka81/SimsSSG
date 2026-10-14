@@ -45,3 +45,67 @@ body {
     background-attachment: scroll;
   }
 }
+/*Gemensamma knappar som används i hela appen*/
+.button-primary,
+.button-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/*Orange huvudknapp, t.ex. Login, Add person och Camera*/
+.button-primary {
+  background: #ff6a00;
+  border: none;
+}
+
+.button-primary:hover {
+  background: #e55f00;
+}
+
+/*Mörk knapp, t.ex. Cancel*/
+.button-secondary {
+  background: #080808;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.button-secondary:hover {
+  border-color: #ff6a00;
+}
+
+/*Knappar som inte går att trycka på, t.ex. medan något sparas*/
+.button-primary:disabled,
+.button-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/*Röd knapp för farliga handlingar, t.ex. Delete*/
+.button-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  font-weight: bold;
+  color: #e53935;
+  background: rgba(229, 57, 53, 0.08);
+  border: 1px solid rgba(229, 57, 53, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.button-danger:hover {
+  color: white;
+  background: #e53935;
+}
+
+.button-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

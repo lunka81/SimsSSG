@@ -1,9 +1,17 @@
 import "./Header.css";
 
-function Header() {
+// Texten som visas i rubriken. highlight är den orangea delen och kan utelämnas
+type HeaderProps = {
+  title: string;
+  highlight?: string;
+};
+
+function Header({ title, highlight }: HeaderProps) {
   return (
     <header className="header">
-        <h1>Admin <span>side</span></h1>
+      <h1>
+        {title} {highlight && <span>{highlight}</span>}
+      </h1>
       <div className="header-line"></div>
     </header>
   );

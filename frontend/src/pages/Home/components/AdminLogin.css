@@ -70,26 +70,3 @@
     gap: 12px;
     margin-top: 12px;
 }
-
-.login-button {
-    font-weight: bold;
-    color: white;
-    background: #ff6a00;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-.login-button:hover {
-    background: #e55f00;
-}
-
-.cancel-button {
-    font-weight: bold;
-    color: white;
-    background: #080808;
-    padding: 8px 12px;
-    border-radius: 8px;
-    cursor: pointer;
-}

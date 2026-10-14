@@ -42,11 +42,11 @@ function AdminLogin({ onClose }: AdminLoginProps) {
                     </label>
                     {error && <p className="login-error">{error}</p>}
                     <div className="buttons">
-                        <button type="submit" className="login-button">
+                        <button type="submit" className="button-primary">
                             Login
                         </button>
                         {/*När någon trycker på knappen anropas onClose-funktionen*/}
-                        <button type="button" onClick={onClose} className="cancel-button">
+                        <button type="button" onClick={onClose} className="button-secondary">
                             Cancel
                         </button>
                     </div>

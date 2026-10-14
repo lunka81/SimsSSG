@@ -1,9 +1,68 @@
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import Header from "./Header";
+import PersonTable, { type Person } from "./PersonTable";
+import {
+  getEmployees,
+  updateEmployee,
+  deleteEmployee,
+  type Employee,
+  type EmployeeUpdate,
+} from "../../../api/employees";
+import { Plus } from "lucide-react";
+import "../Admin.css";
 import "./Persons.css";
-import type { Person } from "./StoredPersons";
+
+// Översätter backendens fältnamn till de som Person-typen använder
+function toPerson(employee: Employee): Person {
+  return {
+    id: employee.uuid,
+    name: employee.name,
+    access: employee.role,
+    department: employee.description ?? "",
+    active: employee.active,
+    createdAt: employee.created_at,
+  };
+}
 
 function Persons() {
+  const [persons, setPersons] = useState<Person[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+
+  // Hämtar alla personer från databasen när sidan öppnas
+  useEffect(() => {
+    getEmployees()
+      .then((employees) => setPersons(employees.map(toPerson)))
+      .catch((error) => setError(error.message));
+  }, []);
+
+  // Sparar ändringar och byter ut personen i listan mot den uppdaterade versionen från backend
+  async function updatePerson(id: string, changes: EmployeeUpdate) {
+    const updated = await updateEmployee(id, changes);
+    setPersons((previous) =>
+      previous.map((person) => (person.id === id ? toPerson(updated) : person))
+    );
+  }
+
+  // Tar bort personen ur databasen och ur listan
+  async function deletePerson(id: string) {
+    await deleteEmployee(id);
+    setPersons((previous) => previous.filter((person) => person.id !== id));
+  }
+
   return (
-        <h2>Persons</h2>
+    <div className="content persons-page">
+      <div className="person-table-header">
+        <Header title="Person" highlight="Register" />
+        <button type="button" className="button-primary button-large" onClick={() => navigate("/admin")}>
+          <Plus size={18} />
+          Add person
+        </button>
+      </div>
+      {error && <p role="alert">{error}</p>}
+      <PersonTable persons={persons} onUpdate={updatePerson} onDelete={deletePerson} />
+    </div>
   );
 }
 
