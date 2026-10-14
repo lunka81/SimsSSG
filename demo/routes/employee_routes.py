@@ -13,14 +13,14 @@ from demo.services.auth_services import verify_access_token
                                         
 from demo.services import employee_services
 
-from demo.models.employee_test import EmployeeTest
+from demo.models.employee_test import EmployeeTest, Permission
 from demo.services.img_services import image_media_type
 
 #a token has to be sent with every request to these endpoints,
 #in order to verify the admin's identity. 
 employee_router = APIRouter(
-    prefix="/api/employee",
-    dependencies=[Depends(verify_access_token)]
+    prefix="/api/employee"
+    #dependencies=[Depends(verify_access_token)]
 )
 
 @employee_router.get("/", response_model=list[EmployeeResponse])
@@ -45,6 +45,11 @@ def get_employee_image(emp_id: UUID, session: Session = Depends(get_session)):
 #store
 @employee_router.post("/",response_model=EmployeeResponse, status_code=201)
 def add_employee(employee: EmployeeCreate, session: Session = Depends(get_session)):
+    '''if employee.permission == Permission.ADMIN:
+        raise HTTPException(
+            status_code=422,
+            detail="Wrong endpoint for admin creation."
+        )'''
     return employee_services.add_employee(session, employee) #exceptions handled in img_services.py
         
 @employee_router.delete("/{emp_id}", status_code=204)

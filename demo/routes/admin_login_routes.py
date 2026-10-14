@@ -9,8 +9,6 @@ login_router = APIRouter(
     tags=["auth"]
 )
 
-#TODO: protect these routes with get_access_token-dependencies.
-
 @login_router.post("/login", response_model=AdminLoginResponse)
 def authorize_login(login_details: AdminLogin, session: Session = Depends(get_session)) -> AdminLoginResponse:
     #HTTP status code communicates approved or denied login attempt:
@@ -28,7 +26,6 @@ def authorize_login(login_details: AdminLogin, session: Session = Depends(get_se
         access_token=create_access_token(admin)
     )
     
-
 @login_router.post("/register", response_model=AdminResponse)
 def register_admin(admin: AdminCreate, session: Session = Depends(get_session)) -> AdminResponse:
     if not username_unique(session, admin.username):

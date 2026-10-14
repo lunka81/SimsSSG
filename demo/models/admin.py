@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
 class Admin(Base):
     __tablename__ = "admin"
-
+    '''
     uuid: Mapped[UUID] = mapped_column(
         Uuid,
         primary_key=True,
@@ -26,6 +26,12 @@ class Admin(Base):
         ForeignKey("employees.uuid", ondelete="CASCADE"),
         nullable=False, #admin account must be tied to an employee
         unique=True #employee can have max 1 admin account
+    )
+    '''
+    uuid: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("employees.uuid", ondelete="CASCADE"),
+        primary_key=True
     )
 
     username: Mapped[str] = mapped_column(
@@ -39,6 +45,7 @@ class Admin(Base):
         nullable=False
     )
 
+    #__mapper_args__ = {"polymorphic_identity": "admin"}
+
     employee: Mapped["EmployeeTest"] = relationship(back_populates="admin")
-    #hash_password: Mapped[something] = mapped_column()
     #relation to employee. admin should maybe be a weak entity type (can't exist unless "owned" by an employee entity.)

@@ -62,6 +62,7 @@ class EmployeeTest(Base):
         cascade="all, delete-orphan"
     )
 
+    #__mapper_args__ = {"polymorphic_on": type, "polymorphic_identity": "employee"}
     admin: Mapped["Admin | None"] = relationship(
         back_populates="employee",
         cascade="all, delete-orphan"

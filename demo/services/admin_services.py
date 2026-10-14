@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 from demo.schemas.admin_schema import AdminCreate, AdminLogin, AdminResponse, AdminLoginResponse
-from demo.services.employee_services import add_employee
+from demo.services.employee_services import build_employee
 from demo.models.admin import Admin
 
 #argon2 hash
@@ -24,20 +24,19 @@ def add_admin(session: Session, admin: AdminCreate) -> AdminResponse:
     #since AdminCreate inherits from EmployeeCreate, 
     #you can simple pass in an child instance where a base instance is expected,
     #and the extra member variables in AdminCreate are ignored.
-    emp = add_employee(session, admin)
+    emp = build_employee(admin)
 
     password_hash = password_hasher.hash(admin.plain_password)
-    new_admin = Admin(
+    emp.admin = Admin(
         username=admin.username, 
         password_hash=password_hash, 
-        employee_uuid=emp.uuid
     )
     #create the relation between the new employee and their admin account.
-    session.add(new_admin)
+    session.add(emp)
     session.commit()
-    session.refresh(new_admin)
+    session.refresh(emp)
     return AdminResponse(
-        username=new_admin.username,
-        uuid=new_admin.uuid
+        username=emp.admin.username,
+        uuid=emp.admin.uuid
     )
 
