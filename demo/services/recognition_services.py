@@ -3,8 +3,10 @@ import os
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from tensorflow import timestamp
 
 from demo.models.employee_test import EmployeeTest
+from demo.models.employee_test_log import EmployeeTestLog
 
 
 def identify_employee(
@@ -57,7 +59,12 @@ def identify_employee(
     print(
         f"Cosine similarity: {similarity:.4f}, "
         f"threshold: {threshold:.4f}, "
+        f"name: {EmployeeTest.name}, "
+        f"timestamp: {match.timestamp}"
+        f"similarity: {match.similarity:.4f}, "
+        f"distance: {match.distance:.4f}, "
         f"approved: {approved}"
+
     )
 
     return {
