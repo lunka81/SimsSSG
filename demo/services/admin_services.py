@@ -3,6 +3,7 @@ from sqlalchemy import select
 from demo.schemas.admin_schema import AdminCreate, AdminLogin, AdminResponse, AdminLoginResponse
 from demo.services.employee_services import build_employee
 from demo.models.admin import Admin
+from demo.models.employee_test import Permission
 
 #argon2 hash
 from pwdlib import PasswordHash
@@ -25,7 +26,8 @@ def add_admin(session: Session, admin: AdminCreate) -> AdminResponse:
     #you can simple pass in an child instance where a base instance is expected,
     #and the extra member variables in AdminCreate are ignored.
     emp = build_employee(admin)
-
+    #One could create an admin with another employee permission value without this.
+    emp.permission = Permission.ADMIN
     password_hash = password_hasher.hash(admin.plain_password)
     emp.admin = Admin(
         username=admin.username, 

@@ -11,8 +11,6 @@ from pydantic import FiniteFloat
 
 from fastapi import HTTPException
 
-
-
 def decode_image_to_bgr(image_data_url: str) -> tuple[bytes, np.ndarray]:
     """Decodes a data URL and returns image bytes and a BGR array.
 

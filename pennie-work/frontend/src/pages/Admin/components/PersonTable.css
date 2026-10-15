@@ -1,0 +1,270 @@
+/*Behållare för verktygsraden och tabellrutan, med glapp mellan dem*/
+.person-table {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/*Rutan runt rubriken, tabellen och sidbläddringen*/
+.person-table-card {
+    padding: 20px;
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.person-table-card h2 {
+    color: #aaa;
+}
+
+.person-table h2 {
+    margin: 0;
+}
+
+.person-row {
+    cursor: pointer;
+    outline: 1px solid transparent;
+    outline-offset: -1px;
+}
+
+.person-row:hover {
+    position: relative;
+    outline-color: #ff6a00;
+}
+
+.person-row:hover td {
+    background: #121212;
+}
+
+/*Sökfältet, filtren och knappen på en rad*/
+.person-table-toolbar {
+    display: grid;
+    grid-template-columns: minmax(200px, 2fr) repeat(2, minmax(140px, 1fr)) auto;
+    gap: 12px;
+    padding: 16px;
+    background: #080808;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+}
+
+/*Gemensam stil för sökfältet, filtren och knappen*/
+.person-table-search,
+.person-table-filter,
+.person-table-clear {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: 52px;
+    color: white;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+}
+
+.person-table-search:focus-within,
+.person-table-filter:focus-within,
+.person-table-clear:hover {
+    border-color: #ff6a00;
+}
+
+/*Sökfältet: förstoringsglaset till vänster om texten*/
+.person-table-search {
+    gap: 10px;
+    padding: 0 14px;
+    color: #aaa;
+}
+
+.person-table-search input {
+    flex: 1;
+    min-width: 0;
+    padding: 0;
+    font-size: 14px;
+    color: white;
+    background: none;
+    border: none;
+    outline: none;
+}
+
+.person-table-search input::placeholder {
+    color: #777;
+}
+
+/*Filtren: liten rubrik ovanför det valda värdet*/
+.person-table-filter {
+    cursor: pointer;
+}
+
+/*Rubriken ligger ovanpå valet, men klick går igenom till valet*/
+.person-table-filter span {
+    position: absolute;
+    top: 7px;
+    left: 14px;
+    z-index: 1;
+    font-size: 11px;
+    color: #aaa;
+    pointer-events: none;
+}
+
+/*Valet täcker hela rutan så att man kan klicka var som helst i den.
+Padding-top skjuter ner det valda värdet under rubriken*/
+.person-table-filter select {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    padding: 22px 36px 6px 14px;
+    font-size: 14px;
+    color: white;
+    background: none;
+    border: none;
+    border-radius: 8px;
+    outline: none;
+    cursor: pointer;
+    /*Döljer webbläsarens egen pil så att vår ikon visas i stället*/
+    appearance: none;
+}
+
+/*Listan som fälls ut ska också vara mörk*/
+.person-table-filter option {
+    background: #121212;
+}
+
+.filter-arrow {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1;
+    color: #aaa;
+    pointer-events: none;
+}
+
+/*Knappen som rensar alla filter*/
+.person-table-clear {
+    gap: 8px;
+    padding: 0 18px;
+    font-size: 14px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+
+/*På smalare skärmar hamnar sökfältet på en egen rad och filtren under*/
+@container (max-width: 900px) {
+    .person-table-toolbar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .person-table-search {
+        grid-column: 1 / -1;
+    }
+}
+
+/*Gör att tabellen kan scrollas i sidled på smala skärmar*/
+.person-table-wrapper {
+    overflow-x: auto;
+    margin-top: 16px;
+    width: 100%;
+
+    scrollbar-width: thin;
+    scrollbar-color: #ff6a00 transparent;
+}
+
+.person-table table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.person-table th {
+    text-align: left;
+    color: #aaa;
+    font-weight: bold;
+}
+
+.person-table td {
+    /*Samma radhöjd som när det fanns knappar i raderna*/
+    height: 64px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.person-table td,
+.person-table th {
+    padding: 14px 10px;
+    white-space: nowrap;
+}
+
+.person-picture {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background: #222;
+}
+
+.icon-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 36px;
+    height: 36px;
+    color: white;
+    background: #121212;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.icon-button:hover {
+    border-color: #ff6a00;
+    color: #ff6a00;
+}
+
+/*Rubrikerna i tabellen ser ut som text men är knappar*/
+.sort-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+    font: inherit;
+    font-weight: bold;
+    color: #aaa;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.sort-button:hover {
+    color: #ff6a00;
+}
+
+/*Raden under tabellen med antal och sidknappar*/
+.person-table-pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    font-size: 14px;
+    color: #aaa;
+}
+
+.pagination-buttons {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/*Knappen ser avstängd ut på första och sista sidan*/
+.icon-button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.icon-button:disabled:hover {
+    color: white;
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.person-table-container h2 {
+    font-size: 14px;
+
+}
+

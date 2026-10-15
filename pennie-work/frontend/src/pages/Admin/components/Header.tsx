@@ -1,22 +1,17 @@
 import "./Header.css";
-import { logout } from "../../../auth";
-import { useNavigate } from "react-router-dom";
 
-function Header() {
-  const navigate = useNavigate();
+// Texten som visas i rubriken. highlight är den orangea delen och kan utelämnas
+type HeaderProps = {
+  title: string;
+  highlight?: string;
+};
 
-  function handleLogout() {
-    logout();
-    navigate("/");
-  }
+function Header({ title, highlight }: HeaderProps) {
   return (
     <header className="header">
-      <div className="header-content">
-        <h1>Admin <span>side</span></h1>
-        <button type="button" className="logout-button" onClick={handleLogout}>
-          Log out
-        </button>
-      </div>
+      <h1>
+        {title} {highlight && <span>{highlight}</span>}
+      </h1>
       <div className="header-line"></div>
     </header>
   );

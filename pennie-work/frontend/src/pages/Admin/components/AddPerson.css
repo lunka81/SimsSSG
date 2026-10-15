@@ -1,7 +1,7 @@
 .add-person-form {
     display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 24px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 32px;
     margin-top: 20px;
 }
 
@@ -9,13 +9,14 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    justify-content: space-between
 }
 
 .add-person-fields label {
     display: flex;
     flex-direction: column;
     gap: 6px;
-    font-size: 14px;
+    font-size: 16px;
 }
 
 .required {
@@ -29,6 +30,8 @@
 
 .add-person input,
 .add-person select {
+    width: 100%;
+    min-width: 0;
     padding: 12px;
     font-size: 14px;
     color: white;
@@ -55,7 +58,7 @@
 
 .picture-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 185px);
     gap: 12px;
 }
 
@@ -109,11 +112,11 @@
     grid-column: 1 / -1;
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
+    gap: 16px;
 }
 
-@media (max-width: 600px) {
+@container (max-width: 500px) {
     .add-person-form {
-        grid-template-columns: 1fr;
+        grid-template-columns: minmax(0, 1fr);
     }
 }

@@ -1,114 +1,111 @@
-import { useCallback, useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-import { isLoggedIn } from "../../auth";
-import { deleteEmployee, getEmployees, type Employee } from "../../api";
 import Header from "./components/Header";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
-import Sidebar from "./components/Sidebar";
-import StoredPersons, { type Person } from "./components/StoredPersons";
-import EmployeeDetails from "./components/EmployeeDetails";
+import { registerAdmin } from "../../auth";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
+import { createEmployee, getEmployees } from "../../api/employees";
 import "./Admin.css";
-
-// Gör om en person från backenden till det format som tabellen använder
-function toPerson(employee: Employee): Person {
-  return {
-    id: employee.uuid,
-    name: employee.name,
-    access: employee.permission,
-    department: employee.description ?? "",
-    // Finns inte i databasen än, så alla visas som aktiva
-    active: true,
-  };
-}
+import { useState, useEffect } from "react";
 
 function Admin() {
-  // Admin äger listan och delar ut den till AddPerson och StoredPersons
-  const [persons, setPersons] = useState<Person[]>([]);
-  // uuid för personen vars detaljer visas, null när rutan är stängd
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [regPersons, setRegPersons] = useState<number | null>(null);
 
-  // Hämtar alla personer från databasen när sidan öppnas
   useEffect(() => {
     getEmployees()
-      .then((employees) => setPersons(employees.map(toPerson)))
-      .catch((err) => console.error("Could not load persons:", err));
+      .then((employees) => setRegPersons(employees.length))
+      .catch((error) => console.error(error));
   }, []);
 
-  // useCallback så att EmployeeDetails inte lägger till sin Escape-lyssnare på nytt vid varje rendering
-  const closeDetails = useCallback(() => setSelectedId(null), []);
-
-  if (!isLoggedIn()) {
-    return <Navigate to="/" replace />;
-  }
-
-  // Anropas av AddPerson när backenden har sparat personen
-  function addPerson(employee: Employee) {
-    // Skapar en ny lista med alla gamla personer och den nya sist
-    setPersons([...persons, toPerson(employee)]);
-  }
-
-  // Anropas av StoredPersons när man har bekräftat borttagningen
-  async function deletePerson(id: string) {
-    try {
-      // Tar bort personen i databasen först, så att listan bara ändras om det lyckades
-      await deleteEmployee(id);
-    } catch (err) {
-      window.alert(err instanceof Error ? err.message : "Could not remove person");
-      return;
+  // Anropas av AddPerson när man klickar "Add person" och sparar personen i databasen
+  async function handleAddPerson(
+    name: string,
+    access: string,
+    description: string,
+    image: string
+  ): Promise<void> {
+    if (
+      access !== "Standard" &&
+      access !== "Admin" &&
+      access !== "Limited"
+    ) {
+      throw new Error("Invalid permission.");
     }
-    // Behåller alla personer utom den med detta id.
-    // prev används eftersom listan kan ha ändrats medan vi väntade på backenden
-    setPersons((prev) => prev.filter((person) => person.id !== id));
+
+    await createEmployee({
+      name,
+      permission: access,
+      description,
+      img: image,
+    });
+    setRegPersons((previous) => (previous === null ? null : previous + 1));
+  }
+
+  async function handleAddAdmin(
+    name: string,
+    access: string,
+    description: string,
+    image: string,
+    username: string,
+    password: string,
+  ): Promise<void> {
+    if (
+      access !== "Standard" &&
+      access !== "Admin" &&
+      access !== "Limited"
+    ) {
+      throw new Error("Invalid permission.");
+    }
+
+    await registerAdmin({
+      name,
+      permission: access,
+      description,
+      img: image,      
+      username,
+      plain_password: password,
+    });
+    setRegPersons((previous) => (previous === null ? null : previous + 1));
   }
 
   return (
-    <div className="admin-layout">
-      <Sidebar />
-      <main className="app">
-        <div className="content">
-          <Header />
+    <div className="content">
+      <Header title="Admin" highlight="panel" />
 
-          {/*De fyra korten ligger i ett rutnät*/}
-          <div className="event-summary">
-            <Summary
-              icon={<User size={28} />}
-              iconClass="summary-icon"
-              value="24"
-              label="Registered persons"
-              sub="Total"
-            />
-            <Summary
-              icon={<Check size={28} />}
-              iconClass="summary-icon approved"
-              value="18"
-              label="Approved entries"
-              sub="Today"
-            />
-            <Summary
-              icon={<X size={28} />}
-              iconClass="summary-icon"
-              value="2"
-              label="Denied entries"
-              sub="Today"
-            />
-            <Summary
-              icon={<ChartNoAxesColumn size={28} />}
-              iconClass="summary-icon"
-              value="96%"
-              label="Average confidence"
-              sub="Last 30 days"
-            />
-          </div>
+      {/*De fyra korten ligger i ett rutnät*/}
+      <div className="event-summary">
+        <Summary
+          icon={<User size={28} />}
+          iconClass="summary-icon"
+          value={regPersons === null ? "–" : String(regPersons)}
+          label="Registered persons"
+          sub="Total"
+        />
+        <Summary
+          icon={<Check size={28} />}
+          iconClass="summary-icon approved"
+          value="18"
+          label="Approved entries"
+          sub="Today"
+        />
+        <Summary
+          icon={<X size={28} />}
+          iconClass="summary-icon"
+          value="2"
+          label="Denied entries"
+          sub="Today"
+        />
+        <Summary
+          icon={<ChartNoAxesColumn size={28} />}
+          iconClass="summary-icon"
+          value="96%"
+          label="Average confidence"
+          sub="Last 30 days"
+        />
+      </div>
 
-          <div className="mid-content">
-            <AddPerson onAdd={addPerson} />
-            <StoredPersons persons={persons} onDelete={deletePerson} onSelect={setSelectedId} />
-          </div>
-        </div>
-      </main>
-      {selectedId && <EmployeeDetails uuid={selectedId} onClose={closeDetails} />}
+      <div className="mid-content">
+        <AddPerson onAdd={handleAddPerson} onAddAdmin={handleAddAdmin}/>
+      </div>
     </div>
   );
 }

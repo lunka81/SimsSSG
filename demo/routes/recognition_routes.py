@@ -8,7 +8,6 @@ recognition_router = APIRouter(
     tags=["identify"]
 )
 
-#compare
 #an employee log is created here if a match is made.
 @recognition_router.post("/identify", response_model = ComparisonResponse, status_code = 200)
 def compare_employee(
