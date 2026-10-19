@@ -1,5 +1,4 @@
 from uuid import UUID
-
 from pydantic import BaseModel, ConfigDict, Field
 from demo.models.employee_test import Permission
 from demo.models.employee_test_log import EmployeeTestLog
@@ -13,14 +12,13 @@ class EmployeeCreate(BaseModel):
     # The image is sent as a data URL: "data:image/jpeg;base64,..."
     img: str
 
-
 class EmployeeResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    uuid: UUID
+    uuid: UUID 
     name: str
     permission: Permission
-    description: str | None
+    description: str | None = None
 
 class EmployeeDetailResponse(EmployeeResponse):
     employee_logs: list[EmployeeLogResponse] = Field(

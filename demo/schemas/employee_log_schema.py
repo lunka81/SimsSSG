@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict
 class EmployeeLogResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
-    uuid: UUID
+    uuid: UUID | None = None
     employee_uuid: UUID
     timestamp: datetime
     approved: bool

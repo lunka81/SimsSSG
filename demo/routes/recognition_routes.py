@@ -18,19 +18,6 @@ def compare_employee(
 
     comparison_services.validate_api_key(x_api_key)
 
-    '''
-    flow:
-    validate api key -> find nearest face in db -> construct result -> http response to Pi
-
-    response should contain:
-        - Approved
-        - UUID (opt)
-        - Name (opt)
-
-    response function should receive:
-        - Recognition confidence
-        - Closest match (EmployeeTest)
-    '''
     nearest_neighbour=comparison_services.find_nearest_neighbour(session, payload.embedding)
     response=comparison_services.get_compare_response(session, nearest_neighbour)
     return response

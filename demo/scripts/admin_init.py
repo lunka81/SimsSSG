@@ -1,5 +1,5 @@
 #script to create the first admin account. 
-#not possible from the web interface unless one is logged in. 
+#not possible from the web app unless one is logged in. 
 
 import argparse
 import sys
@@ -20,7 +20,7 @@ import demo.models.employee_test
 import demo.models.employee_test_log
 import demo.models.admin
 
-#vibe coded function
+#vibecoded function
 def image_to_data_url(path: Path) -> str:
     #decode_image_to_bgr expects the same format as the frontend sends: 
     #"data:image/jpeg;base64,..."
@@ -44,8 +44,8 @@ def main():
     if not args.image.is_file():
         sys.exit(f"Couldn't find image at {args.image}")
 
-    password = getpass(prompt="Enter password: ")
-    password_reenter = getpass(prompt="Enter password again: ")
+    password = getpass(prompt="Enter admin password: ")
+    password_reenter = getpass(prompt="Enter admin password again: ")
     if password_reenter != password:
         sys.exit("Passwords don't match")
 
@@ -64,7 +64,7 @@ def main():
             sys.exit("Username already exist")
         try:
             add_admin(session, admin_payload)
-        except HTTPException as e:
+        except HTTPException as e: #most likely, face wasn't detected.
             sys.exit(f"Couldn't create admin: {e.detail}") 
     print(f"New admin: {admin_payload.username}")
 

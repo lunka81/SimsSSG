@@ -29,7 +29,7 @@ class EmployeeTestLog(Base):
     employee_uuid: Mapped[UUID] = mapped_column(
         Uuid,
         ForeignKey("employees.uuid"),
-        nullable=False,
+        nullable=True, #For denied access attempts.
         index=True
     )
 
