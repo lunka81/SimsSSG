@@ -8,6 +8,7 @@ from demo.routes.camera_routes import camera_router
 from demo.routes.employee_routes import employee_router
 from demo.routes.recognition_routes import recognition_router
 from demo.routes.admin_login_routes import login_router
+from demo.routes.employee_log_routes import log_router
 
 from contextlib import asynccontextmanager
 from sqlalchemy import text
@@ -32,6 +33,7 @@ app.include_router(camera_router)
 app.include_router(employee_router)
 app.include_router(recognition_router)
 app.include_router(login_router)
+app.include_router(log_router)
 
 '''
 React runs on port 5173 and FastAPI on a different port.

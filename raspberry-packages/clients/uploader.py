@@ -4,7 +4,7 @@ import requests
 from config.config import DEVICE_API_KEY, DEVICE_ID, SERVER_TIMEOUT, SERVER_URL
 
 
-def recognize(face, embedding, timestamp):
+def recognize(face, embedding):
     """Ask the server who the face belongs to.
 
     face is the YuNet row from FaceDetector, embedding the vector from FaceEmbedder.
@@ -13,7 +13,6 @@ def recognize(face, embedding, timestamp):
     """
     payload = {
         "camera_id": DEVICE_ID,
-        "timestamp": timestamp,
         "detection_confidence": float(face[-1]),
         "face_width": int(face[2]),
         "face_height": int(face[3]),

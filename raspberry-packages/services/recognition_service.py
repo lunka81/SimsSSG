@@ -229,7 +229,7 @@ class RecognitionService:
         timestamp = datetime.now(timezone.utc).isoformat()
         self._last_sent = time.monotonic()
 
-        result = recognize(face, embedding, timestamp)
+        result = recognize(face, embedding)
 
         if result is None:
             self._update_status(

@@ -14,20 +14,7 @@ if TYPE_CHECKING:
 
 class Admin(Base):
     __tablename__ = "admin"
-    '''
-    uuid: Mapped[UUID] = mapped_column(
-        Uuid,
-        primary_key=True,
-        default=uuid4
-    )
-
-    employee_uuid: Mapped[UUID] = mapped_column(
-        Uuid,
-        ForeignKey("employees.uuid", ondelete="CASCADE"),
-        nullable=False, #admin account must be tied to an employee
-        unique=True #employee can have max 1 admin account
-    )
-    '''
+    
     uuid: Mapped[UUID] = mapped_column(
         Uuid,
         ForeignKey("employees.uuid", ondelete="CASCADE"),

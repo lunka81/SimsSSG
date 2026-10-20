@@ -19,5 +19,5 @@ def compare_employee(
     comparison_services.validate_api_key(x_api_key)
 
     nearest_neighbour=comparison_services.find_nearest_neighbour(session, payload.embedding)
-    response=comparison_services.get_compare_response(session, nearest_neighbour)
+    response=comparison_services.get_compare_response(session, nearest_neighbour, payload)
     return response

@@ -1,12 +1,9 @@
-from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, Field, FiniteFloat
-from demo.schemas.employee_schema import EmployeeResponse
 
 class ComparisonRequest(BaseModel):
     camera_id: str
-    timestamp: datetime
     detection_confidence: FiniteFloat = Field(ge=0, le=1)
     face_width: int = Field(gt=0)
     face_height: int = Field(gt=0)

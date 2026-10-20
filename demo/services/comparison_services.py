@@ -2,7 +2,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import select
 from fastapi import HTTPException
 from pydantic import FiniteFloat
-from demo.schemas.comparison_schema import NearestNeighbour, ComparisonResponse
+from demo.schemas.comparison_schema import NearestNeighbour, ComparisonResponse, ComparisonRequest
+
 from demo.services.employee_log_services import create_employee_log
 import os
 import secrets
@@ -17,7 +18,6 @@ def validate_api_key(api_key: str | None) -> None:
             status_code=401,
             detail="Invalid API key"
         )
-
 
 def find_nearest_neighbour(session: Session, vector: list[FiniteFloat]) -> NearestNeighbour | None:
 
@@ -46,7 +46,7 @@ def find_nearest_neighbour(session: Session, vector: list[FiniteFloat]) -> Neare
 OPENCV_REC_THRESHHOLD = 0.363
 
 
-def get_compare_response(session: Session, nearest_neighbour : NearestNeighbour | None) -> ComparisonResponse:
+def get_compare_response(session: Session, nearest_neighbour : NearestNeighbour | None, payload: ComparisonRequest) -> ComparisonResponse:
     if nearest_neighbour is None: #employee table is empty.
         return ComparisonResponse(
             approved=False
@@ -56,7 +56,14 @@ def get_compare_response(session: Session, nearest_neighbour : NearestNeighbour 
     if approved:
         employee = session.get(EmployeeTest, nearest_neighbour.uuid)
         #a log is created in relation to the employee who got granted access.
-        log = create_employee_log(session, employee, approved)
+        log = create_employee_log(
+            session, 
+            employee, 
+            payload.camera_id,
+            payload.detection_confidence,
+            payload.face_width,
+            payload.face_height
+        )
 
     return ComparisonResponse(
         approved=approved,

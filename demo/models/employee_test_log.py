@@ -2,7 +2,7 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 from uuid import UUID, uuid4
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Uuid
+from sqlalchemy import DateTime, ForeignKey, Uuid, String, Integer, Float
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from demo.db.database import Base
@@ -13,11 +13,17 @@ if TYPE_CHECKING:
 
 class EmployeeTestLog(Base):
     __tablename__ = "employee_log"
-
+    
     uuid: Mapped[UUID] = mapped_column(
         Uuid,
         primary_key=True,
         default=uuid4
+    )
+    employee_uuid: Mapped[UUID] = mapped_column(
+        Uuid,
+        ForeignKey("employees.uuid"),
+        nullable=False, #Only approved access attempts are logged
+        index=True
     )
 
     timestamp: Mapped[datetime] = mapped_column(
@@ -26,16 +32,23 @@ class EmployeeTestLog(Base):
         nullable=False
     )
 
-    employee_uuid: Mapped[UUID] = mapped_column(
-        Uuid,
-        ForeignKey("employees.uuid"),
-        nullable=True, #For denied access attempts.
-        index=True
+    camera_id: Mapped[str] = mapped_column(
+        String,
+        nullable=False
     )
 
-    approved: Mapped[bool] = mapped_column(
-        Boolean,
-        default=False,
+    detection_confidence: Mapped[float] = mapped_column(
+        Float,
+        nullable=False 
+    )
+
+    face_width: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False
+    )
+
+    face_height: Mapped[int] = mapped_column(
+        Integer,
         nullable=False
     )
 
