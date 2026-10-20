@@ -1,0 +1,9 @@
+numpy==2.5.2
+# Same version as SimsSSG (YuNet detection and face alignment)
+opencv-python==4.14.0.94
+# SFace and liveness on the GPU. The [cuda,cudnn] extras install CUDA/cuDNN as pip packages,
+# so no system CUDA toolkit is needed. Do not install the CPU "onnxruntime" package alongside it.
+onnxruntime-gpu[cuda,cudnn]==1.29.0
+pandas==3.0.6
+matplotlib==3.11.2
+tqdm==4.70.1
