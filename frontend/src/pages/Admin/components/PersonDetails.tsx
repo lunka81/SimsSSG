@@ -115,7 +115,7 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
             </dd>
 
             <dt>Permission</dt>
-            <dd>{person.access}</dd>
+            <dd>{person.permission}</dd>
 
             <dt>Department</dt>
             <dd>{person.department || "–"}</dd>

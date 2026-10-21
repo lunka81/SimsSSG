@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import Header from "./Header";
-import { getEmployees, getEmployeeDetails } from "../../../api/employees";
+import AdminHeader from "./AdminHeader";
+import { getEmployees, getEmployeeLogs } from "../../../api/employees";
 import "./PersonTable.css";
 import "../Admin.css";
 import "./Logbook.css";
@@ -15,7 +15,7 @@ type LogEntry = {
 }
 
 const PAGE_SIZE = 10;
-const MAX_ENTRIES = 30;
+const MAX_ENTRIES = 40;
 
 function formatDateTime(date: string) {
     return new Date(date).toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" });
@@ -28,24 +28,24 @@ function Logbook() {
 
     useEffect(() => {
         async function loadLogs() {
-            const employees = await getEmployees();
-            const details = await Promise.all(employees.map((employee) => getEmployeeDetails(employee.uuid)));
-            const allEntries: LogEntry[] = details.flatMap((detail) =>
-                detail.employee_logs.map((log) => ({
+            const [employees, logs] = await Promise.all([getEmployees(), getEmployeeLogs(MAX_ENTRIES)]);
+            const employeeById = new Map(employees.map((employee) => [employee.uuid, employee]));
+            const latestEntries: LogEntry[] = logs.map((log) => {
+                const employee = employeeById.get(log.employee_uuid);
+                return {
                     id: log.uuid,
                     timestamp: log.timestamp,
                     cameraId: log.camera_id,
-                    name: detail.name,
-                    permission: detail.permission,
-                }))
-            );
-            allEntries.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-            const latestEntries = allEntries.slice(0, MAX_ENTRIES);
+                    name: employee?.name ?? "Unknown person",
+                    permission: employee?.permission ?? "-",
+                };
+            });
             setEntries(latestEntries);
         }
-        loadLogs().catch((error) => setError(error.message));
 
+        loadLogs().catch((error) => setError(error.message));
     }, []);
+
     const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
     const currentPage = Math.min(page, totalPages);
     const start = (currentPage - 1) * PAGE_SIZE;
@@ -53,7 +53,7 @@ function Logbook() {
 
     return (
         <div className="content logbook-page">
-            <Header title="Log" highlight="book" />
+            <AdminHeader title="Log" highlight="book" />
             {error && <p role="alert">{error}</p>}
             <div className="person-table">
                 <div className="person-table-card">

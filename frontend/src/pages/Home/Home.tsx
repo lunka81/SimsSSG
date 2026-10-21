@@ -1,22 +1,27 @@
 import { useEffect, useState } from "react";
-import Header from "./components/Header";
+import HomeHeader from "./components/HomeHeader";
 import ImageCard from "./components/ImageCard";
 import Confidence from "./components/Confidence";
 import AccessRes from "./components/AccessRes";
 import AdminLogin from "./components/AdminLogin";
 import RecognitionView from "./components/Recognition";
-import type { Person } from "./components/Recognition";
+import type { RecognitionResult } from "./components/Recognition";
 import "./Home.css";
 
 const TRAININGS = ["Introduction Fire safety",
   "SSG Entre Contractor Safety",
   "Information security and data protection"]
 
+const RESET_DELAY_MS = 20000;
+
 function Home() {
   const confidence = 80;
-
+  
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [person, setPerson] = useState<Person | null>(null);
+  const [result, setResult] = useState<RecognitionResult>(null);
+
+  const person = result !== null && result.status === "granted" ? result.person : null;
+  const denied = result !== null && result.status === "denied";
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -33,12 +38,20 @@ function Home() {
     };
   }, []);
 
+  useEffect(() => {
+    if (result === null) return;
+
+    const timer = setTimeout(() => setResult(null), RESET_DELAY_MS);
+
+    return () => clearTimeout(timer);
+  }, [result]);
+
   return (
     <main className="app">
-      <RecognitionView onRecognized={setPerson} />
+      <RecognitionView onResult={setResult} />
 
       <div className="content">
-        <Header name={person?.name} />
+        <HomeHeader name={person?.name} />
 
         {isAdminOpen && <AdminLogin onClose={() => setIsAdminOpen(false)} />}
 
@@ -53,7 +66,7 @@ function Home() {
                   <dt>Permission</dt>
                   <dd>{person.permission}</dd>
 
-                  <dt>Description</dt>
+                  <dt>Department</dt>
                   <dd>{person.description || "-"}</dd>
                 </dl>
 
@@ -77,13 +90,19 @@ function Home() {
           <Confidence value={confidence} />
 
           <ImageCard
-            title={person ? "Matching image found" : ""}
-            image={person?.image ?? undefined}
-          />
+            title={person ? "Matching image found" : denied ? "No match found" : ""}
+            image={person?.image ?? undefined}>
+            {denied ? (
+              <div className="no-match" role="alert">
+                <h3>No match found</h3>
+                <p>No person in the database matches the person in front of the camera.</p>
+              </div>
+            ) : undefined}
+          </ImageCard>
         </section>
 
         <section className="access-res">
-          <AccessRes confidence={confidence} />
+          {result !== null && <AccessRes approved={person !== null} />}
         </section>
       </div>
     </main>

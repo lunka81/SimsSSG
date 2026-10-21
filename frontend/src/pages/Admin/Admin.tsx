@@ -1,9 +1,9 @@
-import Header from "./components/Header";
+import AdminHeader from "./components/AdminHeader";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
 import { registerAdmin } from "../../auth";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
-import { createEmployee, getEmployees, getEmployeeDetails } from "../../api/employees";
+import { createEmployee, getEmployees, getEmployeeLogs } from "../../api/employees";
 import "./Admin.css";
 import { useState, useEffect } from "react";
 
@@ -13,10 +13,9 @@ function Admin() {
 
   useEffect(() => {
     async function loadStatistics() {
-      const employees = await getEmployees();
+      const [employees, logs] = await Promise.all([getEmployees(), getEmployeeLogs(100)]);
       setRegPersons(employees.length);
-      const details = await Promise.all(employees.map((employee) => getEmployeeDetails(employee.uuid)));
-      const logs = details.flatMap((detail) => detail.employee_logs);
+
       const startOfToday = new Date();
       startOfToday.setHours(0, 0, 0, 0);
       const approvedLogsToday = logs.filter(
@@ -30,22 +29,23 @@ function Admin() {
   // Anropas av AddPerson när man klickar "Add person" och sparar personen i databasen
   async function handleAddPerson(
     name: string,
-    access: string,
-    description: string,
+    permission: string,
+    department: string,
     image: string
   ): Promise<void> {
     if (
-      access !== "Standard" &&
-      access !== "Admin" &&
-      access !== "Limited"
+      permission !== "Standard" &&
+      permission !== "Admin" &&
+      permission !== "Limited"
     ) {
       throw new Error("Invalid permission.");
     }
 
     await createEmployee({
       name,
-      permission: access,
-      description,
+      permission,
+      //heter description i backend
+      description: department,
       img: image,
     });
     setRegPersons((previous) => (previous === null ? null : previous + 1));
@@ -53,24 +53,24 @@ function Admin() {
 
   async function handleAddAdmin(
     name: string,
-    access: string,
-    description: string,
+    permission: string,
+    department: string,
     image: string,
     username: string,
     password: string,
   ): Promise<void> {
     if (
-      access !== "Standard" &&
-      access !== "Admin" &&
-      access !== "Limited"
+      permission !== "Standard" &&
+      permission !== "Admin" &&
+      permission !== "Limited"
     ) {
       throw new Error("Invalid permission.");
     }
 
     await registerAdmin({
       name,
-      permission: access,
-      description,
+      permission,
+      description: department,
       img: image,
       username,
       plain_password: password,
@@ -80,7 +80,7 @@ function Admin() {
 
   return (
     <div className="content">
-      <Header title="Admin " highlight="Panel" />
+      <AdminHeader title="Admin " highlight="Panel" />
 
       {/*De fyra korten ligger i ett rutnät*/}
       <div className="event-summary">

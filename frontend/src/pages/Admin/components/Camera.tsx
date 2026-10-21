@@ -61,6 +61,7 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
 
     useEffect(() => {
       if (!autoStart) return;
+      const videoElement = videoRef.current;
 
       let cancelled = false;
       let ownedStream: MediaStream | null = null;
@@ -112,8 +113,8 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
         if (streamRef.current === ownedStream) {
           streamRef.current = null;
 
-          if (videoRef.current) {
-            videoRef.current.srcObject = null;
+          if (videoElement) {
+            videoElement.srcObject = null;
           }
         }
       };

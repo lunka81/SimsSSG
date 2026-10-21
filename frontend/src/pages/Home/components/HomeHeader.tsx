@@ -1,10 +1,10 @@
-import "./Header.css";
+import "./HomeHeader.css";
 
 type HeaderProps = {
   name?: string;
 };
 
-function Header({ name }: HeaderProps) {
+function HomeHeader({ name }: HeaderProps) {
   return (
     <header className="home-header">
       <div className="home-header-left">
@@ -17,4 +17,4 @@ function Header({ name }: HeaderProps) {
   );
 }
 
-export default Header;
+export default HomeHeader;

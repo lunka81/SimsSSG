@@ -64,7 +64,28 @@
   font-weight: bold;
 }
 
-/*Rubrik till vänster, värde till höger*/
+.no-match {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.no-match h3 {
+  margin: 0;
+  color: #e53935;
+}
+
+.no-match p {
+  margin: 0;
+  max-width: 280px;
+  color: #aaa;
+}
+
 .person-info {
   display: grid;
   grid-template-columns: auto 1fr;

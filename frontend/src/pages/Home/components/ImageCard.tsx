@@ -6,14 +6,12 @@ import type { ReactNode } from "react";
 type ImageCardProps = {
   title: string;
   image?: string;
-  showCorners?: boolean;
   children?: ReactNode;
 };
 
 function ImageCard({
   title,
   image,
-  showCorners,
   children,
 }: ImageCardProps) {
   return (
@@ -23,17 +21,8 @@ function ImageCard({
       </div>
 
       <div className="image-placeholder">
-  {children ?? (
-    image ? <img src={image} alt={title} /> : <p>No picture</p>
-  )}
-
-        {showCorners && (
-          <>
-            <span className="corner top-left"></span>
-            <span className="corner top-right"></span>
-            <span className="corner bottom-left"></span>
-            <span className="corner bottom-right"></span>
-          </>
+        {children ?? (
+          image ? <img src={image} alt={title} /> : <p>No picture</p>
         )}
       </div>
     </div>

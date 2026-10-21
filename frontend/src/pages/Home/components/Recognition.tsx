@@ -13,11 +13,16 @@ type RecognitionMessage =
   | { event: "person_recognized"; person: Person }
   | { event: "person_not_recognized"; person: null };
 
+export type RecognitionResult =
+    | null
+    | {status: "granted"; person: Person}
+    | {status: "denied"}
+
 type Props = {
-  onRecognized: (person: Person) => void;
+  onResult: (result: RecognitionResult) => void;
 };
 
-export default function RecognitionView({ onRecognized }: Props) {
+export default function RecognitionView({ onResult }: Props) {
   useEffect(() => {
     const token = getToken();
     if (token === null) return;
@@ -32,12 +37,14 @@ export default function RecognitionView({ onRecognized }: Props) {
       const data: RecognitionMessage = JSON.parse(event.data);
 
       if (data.event === "person_recognized") {
-        onRecognized(data.person);
+        onResult({status: "granted", person: data.person});
+      } else if (data.event === "person_not_recognized") {
+        onResult({status: "denied"});
       }
     };
 
     return () => socket.close();
-  }, [onRecognized]);
+  }, [onResult]);
 
   return null;
 }
