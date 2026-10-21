@@ -13,7 +13,13 @@ recognition_router = APIRouter(
     tags=["identify"]
 )
 
-@recognition_router.post("/identify",response_model=ComparisonResponse,status_code=200)
+@recognition_router.post(
+    "/identify",
+    response_model=ComparisonResponse,
+    status_code=200,
+    summary="HTTP POST endpoint to which the raspberry pi sends embeddings of captured faces upon access attempts.",
+    description="Calls functions for nearest neighbour search and response construction, then communicates the response to the frontend's start page via a websocket."   
+)
 async def compare_employee(
     payload: ComparisonRequest,
     session: Session = Depends(get_session),
@@ -54,6 +60,9 @@ async def compare_employee(
         })
     return response
 
+
+#summary: HTTP websocket endpoint that listens for continious requests using the websocket protocol.
+#description: This is a way for the backend to communicate, to the frontend, the details of an employee being identified at the gate.
 
 #Endpoint written by Anders. Pushed by me because Anders has some bugs he doesn't want to commit to this branch.
 @recognition_router.websocket("/ws")

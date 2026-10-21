@@ -13,7 +13,12 @@ log_router = APIRouter(
     dependencies=[Depends(verify_access_token)]
 )
 
-@log_router.get("/", response_model = list[EmployeeLogResponse])
+@log_router.get(
+    "/", 
+    response_model = list[EmployeeLogResponse],
+    summary="HTTP GET endpoint for getting a given number of logs created before a given timestamp.",
+    description="Number of logs defaults to 30, and can be between [1, 100]."    
+)
 def get_logs_before_timestamp(
     limit: int = Query(30, ge=1, le=100), #frontend decides n logs to fetch
     before: datetime | None = None, #return n logs before this timestamp

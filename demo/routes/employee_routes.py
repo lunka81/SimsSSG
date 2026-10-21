@@ -23,11 +23,21 @@ employee_router = APIRouter(
     dependencies=[Depends(verify_access_token)]
 )
 
-@employee_router.get("/", response_model=list[EmployeeResponse])
+@employee_router.get(
+    "/",
+    response_model=list[EmployeeResponse],
+    summary="HTTP GET endpoint to get a list of all employees in the database.",
+    description="Includes all attributes except embedding and logs."
+)
 def get_employees(session: Session = Depends(get_session)):
     return employee_services.get_employees(session)
 
-@employee_router.get("/{emp_id}", response_model=EmployeeDetailResponse)
+@employee_router.get(
+    "/{emp_id}", 
+    response_model=EmployeeDetailResponse,
+    summary="HTTP GET endpoint to get the data of a specified employee.",
+    description="This data includes the employee's logs."
+)
 def get_employee(emp_id: UUID, session: Session = Depends(get_session)):
     emp = employee_services.get_employee_details(session, emp_id)
     if emp is None: #if id isn't found cached or in db
@@ -35,7 +45,11 @@ def get_employee(emp_id: UUID, session: Session = Depends(get_session)):
     return emp
 
 #the image is sent as a regular image file so that it can be used directly in <img src="...">
-@employee_router.get("/{emp_id}/image")
+@employee_router.get(
+    "/{emp_id}/image",
+    summary="HTTP GET endpoint to get the database image of a specified employee.",
+    description="Convenient for direct data-url use in the frontend."
+)
 def get_employee_image(emp_id: UUID, session: Session = Depends(get_session)):
     emp = employee_services.get_employee_details(session, emp_id)
     if emp is None: #if id isn't found cached or in db  
@@ -43,16 +57,22 @@ def get_employee_image(emp_id: UUID, session: Session = Depends(get_session)):
     return Response(content=emp.image, media_type=image_media_type(emp.image))
 
 #store
-@employee_router.post("/",response_model=EmployeeResponse, status_code=201)
+@employee_router.post(
+    "/",
+    response_model=EmployeeResponse, 
+    status_code=201,
+    summary="HTTP POST endpoint for creating a new employee row.",
+    description="Exceptions are handled elsewhere."
+)
 def add_employee(employee: EmployeeCreate, session: Session = Depends(get_session)):
-    '''if employee.permission == Permission.ADMIN:
-        raise HTTPException(
-            status_code=422,
-            detail="Wrong endpoint for admin creation."
-        )'''
     return employee_services.add_employee(session, employee) #exceptions handled in img_services.py
         
-@employee_router.delete("/{emp_id}", status_code=204)
+@employee_router.delete(
+    "/{emp_id}", 
+    status_code=204,
+    summary="HTTP DELETE endpoint for deleting an employee row.",
+    description="Empty response body, following http conventions"
+)
 def delete_employee(emp_id: UUID, session: Session = Depends(get_session)):
     emp = session.get(EmployeeTest, emp_id)
     if emp is None: #if id isn't found cached or in db

@@ -9,7 +9,12 @@ login_router = APIRouter(
     tags=["auth"]
 )
 
-@login_router.post("/login", response_model=AdminLoginResponse)
+@login_router.post(
+    "/login",
+    response_model=AdminLoginResponse,
+    summary="HTTP POST endpoint for authorizing admin login details.",
+    description="Doesn't specify which credential is wrong when authorization fails."    
+)
 def authorize_login(login_details: AdminLogin, session: Session = Depends(get_session)) -> AdminLoginResponse:
     #HTTP status code communicates approved or denied login attempt:
     #200 -> authorized
@@ -26,7 +31,12 @@ def authorize_login(login_details: AdminLogin, session: Session = Depends(get_se
         access_token=create_access_token(admin)
     )
     
-@login_router.post("/register", response_model=AdminResponse)
+@login_router.post(
+    "/register", 
+    response_model=AdminResponse,
+    summary="HTTP POST endpoint to create a new employee row in relation to a new admin row.",
+    description="Checks username uniqueness before anything. Employee and admin entity creation is done in one transaction to avoid orphans."    
+)
 def register_admin(admin: AdminCreate, session: Session = Depends(get_session)) -> AdminResponse:
     if not username_unique(session, admin.username):
         raise HTTPException(

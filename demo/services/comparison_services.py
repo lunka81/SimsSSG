@@ -45,8 +45,11 @@ def find_nearest_neighbour(session: Session, vector: list[FiniteFloat]) -> Neare
 
 OPENCV_REC_THRESHHOLD = 0.363
 
-
-def get_compare_response(session: Session, nearest_neighbour : NearestNeighbour | None, payload: ComparisonRequest) -> ComparisonResponse:
+def get_compare_response(
+        session: Session, 
+        nearest_neighbour : NearestNeighbour | None, #None if employees-table is empty.
+        payload: ComparisonRequest
+) -> ComparisonResponse:
     if nearest_neighbour is None: #employee table is empty.
         return ComparisonResponse(
             approved=False
