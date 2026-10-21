@@ -174,7 +174,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                 {/*Knappar för att bläddra mellan sidorna*/}
                 <div className="person-table-pagination">
                     <span>
-                        Showing {sortedPersons.length === 0 ? 0 : start + 1}–{start + visiblePersons.length} of {sortedPersons.length}
+                        Showing {sortedPersons.length === 0 ? 0 : start + 1}-{start + visiblePersons.length} of {sortedPersons.length}
                     </span>
 
                     <div className="pagination-buttons">

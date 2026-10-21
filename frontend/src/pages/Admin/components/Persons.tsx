@@ -38,7 +38,7 @@ function Persons() {
   return (
     <div className="content persons-page">
       <div className="person-table-header">
-        <Header title="Person" highlight="Register" />
+        <Header title="Person " highlight="Register" />
         <button type="button" className="button-primary button-large" onClick={() => navigate("/admin")}>
           <Plus size={18} />
           Add person

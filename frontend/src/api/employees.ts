@@ -25,7 +25,10 @@ export type EmployeeLog = {
   uuid: string;
   employee_uuid: string;
   timestamp: string;
-  approved: boolean;
+  camera_id: string;
+  detection_confidence: number;
+  face_width: number;
+  face_height: number;
 };
 
 // En person med alla sina passager

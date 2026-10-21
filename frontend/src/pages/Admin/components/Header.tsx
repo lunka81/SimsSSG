@@ -10,7 +10,7 @@ function Header({ title, highlight }: HeaderProps) {
   return (
     <header className="header">
       <h1>
-        {title} {highlight && <span>{highlight}</span>}
+        {title}{highlight && <span>{highlight}</span>}
       </h1>
       <div className="header-line"></div>
     </header>

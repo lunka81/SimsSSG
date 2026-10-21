@@ -4,37 +4,82 @@ import ImageCard from "./components/ImageCard";
 import Confidence from "./components/Confidence";
 import AccessRes from "./components/AccessRes";
 import AdminLogin from "./components/AdminLogin";
-/*Importerar bilder som används på sidan*/
-import cameraImage from "../../assets/background3.jpg";
-import databaseImage from "../../assets/background2.jpg";
+import RecognitionView from "./components/Recognition";
+import type { Person } from "./components/Recognition";
 import "./Home.css";
+
+const TRAININGS = ["Introduction Fire safety",
+  "SSG Entre Contractor Safety",
+  "Information security and data protection"]
 
 function Home() {
   const confidence = 80;
+
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [person, setPerson] = useState<Person | null>(null);
+
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
-      if (e.code == "KeyA" && e.ctrlKey && e.altKey && !e.repeat) {
+      if (e.code === "KeyA" && e.ctrlKey && e.altKey && !e.repeat) {
         e.preventDefault();
         setIsAdminOpen(true);
       }
     }
+
     window.addEventListener("keydown", handleKeyDown);
+
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
-  /*Detta är vad som syns på sidan*/
+
   return (
     <main className="app">
+      <RecognitionView onRecognized={setPerson} />
+
       <div className="content">
-        <Header firstname="Saga" surname="Jonsson" />
-        {/*När onClose anropas skörs setIsAdminOpen(false) via AdminLogin*/}
+        <Header name={person?.name} />
+
         {isAdminOpen && <AdminLogin onClose={() => setIsAdminOpen(false)} />}
+
         <section className="recognition">
-          <ImageCard title="Camera Image" image={cameraImage} showCorners />
+          <ImageCard title="Person information">
+            {person ? (
+              <>
+                <dl className="person-info">
+                  <dt>Name</dt>
+                  <dd>{person.name}</dd>
+
+                  <dt>Permission</dt>
+                  <dd>{person.permission}</dd>
+
+                  <dt>Description</dt>
+                  <dd>{person.description || "-"}</dd>
+                </dl>
+
+                <div className="trainings">
+                  <h3>Trainings</h3>
+                  <ul className="training-list">
+                    {TRAININGS.map((training) => (
+                      <li key={training}>
+                        <span className="training-check">✓</span>
+                        {training}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </>
+            ) : (
+              <p>Waiting for identification...</p>
+            )}
+          </ImageCard>
+
           <Confidence value={confidence} />
-          <ImageCard title="Database Image" image={databaseImage} />
+
+          <ImageCard
+            title={person ? "Matching image found" : ""}
+            image={person?.image ?? undefined}
+          />
         </section>
 
         <section className="access-res">

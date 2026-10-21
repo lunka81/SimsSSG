@@ -8,12 +8,15 @@
 }
 
 .image-title {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .image-title span {
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: bold;
   color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /*Rutan där bilden ligger*/
@@ -24,7 +27,7 @@
   height: clamp(220px, 40vh, 400px);
   overflow: hidden;
   border-radius: 10px;
-  background: #222;
+
 }
 
 .image-placeholder img {

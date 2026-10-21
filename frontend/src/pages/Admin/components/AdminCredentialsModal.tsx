@@ -71,19 +71,19 @@ function AdminCredentialsModal({ personName, onConfirm, onClose }: AdminCredenti
                 e.preventDefault();
                 if (!saving) onClose();
             }}>
-            <h2>Create login for {personName}</h2>
+            <h2>Create login for <span>{personName}</span></h2>
             <form onSubmit={handleSubmit}>
                 <label>
                     Username
-                    <input type="text" name="username" autoFocus />
+                    <input type="text" name="username" placeholder="Username" autoFocus />
                 </label>
                 <label>
                     Password
-                    <input type="password" name="password" autoComplete="new-password" />
+                    <input type="password" name="password" placeholder="Password" autoComplete="new-password" />
                 </label>
                 <label>
                     Confirm password
-                    <input type="password" name="confirmPassword" autoComplete="new-password" />
+                    <input type="password" name="confirmPassword" placeholder="Confirm password" autoComplete="new-password" />
                 </label>
                 {error && <p role="alert">{error}</p>}
                 <div className="addAdmin-button">
