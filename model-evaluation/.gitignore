@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Downloaded on the first pipeline run
+model_weights/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+
+# results
+report/
+results/
