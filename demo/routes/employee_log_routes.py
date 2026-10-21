@@ -14,9 +14,9 @@ log_router = APIRouter(
 )
 
 @log_router.get("/", response_model = list[EmployeeLogResponse])
-def get_last_n_logs(
-    limit: int = Query(30, ge=1, le=100),
-    before: datetime | None = None,
+def get_logs_before_timestamp(
+    limit: int = Query(30, ge=1, le=100), #frontend decides n logs to fetch
+    before: datetime | None = None, #return n logs before this timestamp
     session: Session = Depends(get_session)
 ):
     return employee_log_services.get_logs_before_timestamp(limit, before, session)
