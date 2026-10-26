@@ -1,13 +1,19 @@
 import "./ImageCard.css";
+import type { ReactNode } from "react";
+
+
 
 type ImageCardProps = {
   title: string;
-  image: string;
-  /*Visar de orangea hörnen runt bilden (valfri, false om den inte skickas med)*/
-  showCorners?: boolean;
+  image?: string;
+  children?: ReactNode;
 };
 
-function ImageCard({ title, image, showCorners = false }: ImageCardProps) {
+function ImageCard({
+  title,
+  image,
+  children,
+}: ImageCardProps) {
   return (
     <div className="images-container">
       <div className="image-title">
@@ -15,15 +21,8 @@ function ImageCard({ title, image, showCorners = false }: ImageCardProps) {
       </div>
 
       <div className="image-placeholder">
-        <img src={image} alt={title} />
-
-        {showCorners && (
-          <>
-            <span className="corner top-left"></span>
-            <span className="corner top-right"></span>
-            <span className="corner bottom-left"></span>
-            <span className="corner bottom-right"></span>
-          </>
+        {children ?? (
+          image ? <img src={image} alt={title} /> : <p>No picture</p>
         )}
       </div>
     </div>

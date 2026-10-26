@@ -7,7 +7,7 @@ import { useState } from "react";
 export type Person = {
     id: string;
     name: string;
-    access: string;
+    permission: string;
     department: string;
 };
 
@@ -17,7 +17,7 @@ type PersonTableProps = {
     onDelete: (id: string) => Promise<void>;
 };
 
-type SortKey = "name" | "access" | "department";
+type SortKey = "name" | "permission" | "department";
 type SortDirection = "asc" | "desc";
 
 // Antal personer per sida
@@ -25,8 +25,8 @@ const PAGE_SIZE = 10;
 
 function PersonTable({ persons, onDelete }: PersonTableProps) {
     const [search, setSearch] = useState("");
-    const [permission, setPermission] = useState("all");
-    const [department, setDepartment] = useState("all");
+    const [permissionFilter, setPermissionFilter] = useState("all");
+    const [departmentFilter, setDepartmentFilter] = useState("all");
     const [sortKey, setSortKey] = useState<SortKey | null>(null);
     const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
     const [page, setPage] = useState(1);
@@ -43,10 +43,10 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
         const matchesSearch = person.name.toLowerCase().includes(search.toLowerCase());
 
         const matchesPermission =
-            permission === "all" || person.access === permission;
+            permissionFilter === "all" || person.permission === permissionFilter;
 
         const matchesDepartment =
-            department === "all" || person.department === department;
+            departmentFilter === "all" || person.department === departmentFilter;
 
         return matchesSearch && matchesPermission && matchesDepartment;
     });
@@ -86,8 +86,8 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
     // Återställer sökning, filter och sortering
     function clearFilters() {
         setSearch("");
-        setPermission("all");
-        setDepartment("all");
+        setPermissionFilter("all");
+        setDepartmentFilter("all");
         setSortKey(null);
         setSortDirection("asc");
         setPage(1);
@@ -109,7 +109,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                 {/*Varje filter är en ruta med en liten rubrik ovanför valet*/}
                 <label className="person-table-filter">
                     <span>Permission</span>
-                    <select value={permission} onChange={(e) => { setPermission(e.target.value); setPage(1); }}>
+                    <select value={permissionFilter} onChange={(e) => { setPermissionFilter(e.target.value); setPage(1); }}>
                         <option value="all">All</option>
                         <option value="Standard">Standard</option>
                         <option value="Admin">Admin</option>
@@ -120,7 +120,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
 
                 <label className="person-table-filter">
                     <span>Department</span>
-                    <select value={department} onChange={(e) => { setDepartment(e.target.value); setPage(1); }}>
+                    <select value={departmentFilter} onChange={(e) => { setDepartmentFilter(e.target.value); setPage(1); }}>
                         <option value="all">All</option>
                         {departments.map((name) => (
                             <option key={name} value={name}>{name}</option>
@@ -148,8 +148,8 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                                     </button>
                                 </th>
                                 <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("access")}>
-                                        Permission {sortIcon("access")}
+                                    <button type="button" className="sort-button" onClick={() => handleSort("permission")}>
+                                        Permission {sortIcon("permission")}
                                     </button>
                                 </th>
                                 <th>
@@ -164,7 +164,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                             {visiblePersons.map((person) => (
                                 <tr key={person.id} className="person-row" onClick={() => setSelectedId(person.id)}>
                                     <td>{person.name}</td>
-                                    <td>{person.access}</td>
+                                    <td>{person.permission}</td>
                                     <td>{person.department}</td>
                                 </tr>
                             ))}
@@ -174,7 +174,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                 {/*Knappar för att bläddra mellan sidorna*/}
                 <div className="person-table-pagination">
                     <span>
-                        Showing {sortedPersons.length === 0 ? 0 : start + 1}–{start + visiblePersons.length} of {sortedPersons.length}
+                        Showing {sortedPersons.length === 0 ? 0 : start + 1}-{start + visiblePersons.length} of {sortedPersons.length}
                     </span>
 
                     <div className="pagination-buttons">

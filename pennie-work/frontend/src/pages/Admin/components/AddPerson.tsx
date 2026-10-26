@@ -10,14 +10,14 @@ import CameraModal from "./CameraModal";
 type AddPersonProps = {
     onAdd: (
         name: string,
-        access: string,
+        permission: string,
         department: string,
         image: string,
     ) => Promise<void>;
 
     onAddAdmin: (
         name: string,
-        access: string,
+        permission: string,
         department: string,
         image: string,
         username: string,
@@ -27,8 +27,8 @@ type AddPersonProps = {
 
 type PendingAdmin = {
     name: string;
-    access: string;
-    description: string;
+    permission: string;
+    department: string;
     image: string;
 };
 
@@ -63,17 +63,17 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         const formData = new FormData(form);
 
         const name = String(formData.get("name") ?? "").trim();
-        const access = String(formData.get("access") ?? "");
-        const description = String(formData.get("department") ?? "");
+        const permission = String(formData.get("permission") ?? "");
+        const department = String(formData.get("department") ?? "");
 
         if (!name || !imagePreview) {
             setError("Name and profile picture are required.");
             return;
         }
 
-        if (access === "Admin") {
+        if (permission === "Admin") {
             setError(null);
-            setPendingAdmin({ name, access, description, image: imagePreview });
+            setPendingAdmin({ name, permission, department, image: imagePreview });
             return;
         }
 
@@ -81,7 +81,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         setError(null);
 
         try {
-            await onAdd(name, access, description, imagePreview);
+            await onAdd(name, permission, department, imagePreview);
 
             // Töm först när backend har sparat personen.
             form.reset();
@@ -99,8 +99,8 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         if (pendingAdmin === null) return;
         await onAddAdmin(
             pendingAdmin.name,
-            pendingAdmin.access,
-            pendingAdmin.description,
+            pendingAdmin.permission,
+            pendingAdmin.department,
             pendingAdmin.image,
             username,
             password
@@ -125,7 +125,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         <section className="add-person">
             <h2>Add new person</h2>
 
-            <form className="add-person-form" ref={formRef} onSubmit={handleSubmit}>
+            <form className="add-person-form" ref={formRef} onSubmit={handleSubmit} autoComplete="off">
                 <div className="add-person-fields">
                     <label>
                         <span>
@@ -137,7 +137,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
                         <span>
                             Access permissions <span className="required">*</span>
                         </span>
-                        <select name="access">
+                        <select name="permission">
                             <option value="Standard">Standard</option>
                             <option value="Admin">Admin</option>
                             <option value="Limited">Limited</option>

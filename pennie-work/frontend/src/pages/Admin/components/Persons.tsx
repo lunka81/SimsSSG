@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Header from "./Header";
+import AdminHeader from "./AdminHeader";
 import PersonTable, { type Person } from "./PersonTable";
 import { getEmployees, deleteEmployee, type Employee } from "../../../api/employees";
 import { Plus } from "lucide-react";
@@ -12,7 +12,8 @@ function toPerson(employee: Employee): Person {
   return {
     id: employee.uuid,
     name: employee.name,
-    access: employee.permission,
+    permission: employee.permission,
+    //kallas för description i backend
     department: employee.description ?? "",
   };
 }
@@ -38,7 +39,7 @@ function Persons() {
   return (
     <div className="content persons-page">
       <div className="person-table-header">
-        <Header title="Person" highlight="Register" />
+        <AdminHeader title="Person " highlight="Register" />
         <button type="button" className="button-primary button-large" onClick={() => navigate("/admin")}>
           <Plus size={18} />
           Add person

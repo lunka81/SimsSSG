@@ -25,11 +25,14 @@ export type EmployeeLog = {
   uuid: string;
   employee_uuid: string;
   timestamp: string;
-  approved: boolean;
+  camera_id: string;
+  detection_confidence: number;
+  face_width: number;
+  face_height: number;
 };
 
 // En person med alla sina passager
-export type EmployeeDetails = Employee & {
+type EmployeeDetails = Employee & {
   employee_logs: EmployeeLog[];
 };
 
@@ -98,4 +101,10 @@ export async function deleteEmployee(id: string): Promise<void> {
     headers: authHeaders(),
   });
   await checkResponse(response, "Could not remove the person");
+}
+
+export async function getEmployeeLogs(limit = 30): Promise<EmployeeLog[]> {
+  const response = await fetch(`${BACKEND_URL}/api/employee_logs/?limit=${limit}`, { headers: authHeaders() });
+  await checkResponse(response, "Could not load logs");
+  return response.json();
 }

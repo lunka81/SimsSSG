@@ -4,9 +4,9 @@ import base64
 from demo.services.recognition_socket import manager, send_to_frontend
 from demo.models.employee_test import EmployeeTest
 from demo.schemas.comparison_schema import ComparisonRequest, ComparisonResponse
-from demo.services import comparison_services, img_services, auth_services
+from demo.services import comparison_services, img_services
 from sqlalchemy.orm import Session
-from demo.db.database import get_session, SessionLocal
+from demo.db.database import get_session
 
 recognition_router = APIRouter(
     prefix="/recognition",
@@ -66,17 +66,7 @@ async def compare_employee(
 
 #Endpoint written by Anders. Pushed by me because Anders has some bugs he doesn't want to commit to this branch.
 @recognition_router.websocket("/ws")
-async def recognition_websocket(websocket: WebSocket, token: str):
-    #better than having a get_session dependancy, since the session is only needed for token verification.
-    #with get_session dependency, the session stays open the whole time the websocket is in use.
-    #and, with multiple tabs open, the session pool could run out.
-    with SessionLocal() as session:    
-        admin = auth_services.get_admin_from_token(session, token)
-
-    if admin is None:
-        await websocket.close(code=1008) #no valid token
-        return
-    
+async def recognition_websocket(websocket: WebSocket):
     await manager.connect(websocket)
 
     try:

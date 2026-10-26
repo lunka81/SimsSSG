@@ -10,7 +10,7 @@ function AdminLayout() {
         <div className="admin-layout">
             <Sidebar />
 
-            <main className="app">
+            <main className="admin-main">
                 <Outlet />
             </main>
         </div>

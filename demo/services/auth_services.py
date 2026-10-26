@@ -25,11 +25,6 @@ def create_access_token(admin: Admin) -> str:
     )
     return token
 
-#for the websocket endpoint.
-#the frontend can't set an auth header on the websocket, 
-#so the token is sent as a query parameter, in order to keep unauthorized persons out.
-#the http-bearer dependency reads the token from the request header,
-#hence it can't be used for this case, hence this is a work-around.
 def get_admin_from_token(session: Session, token: str) -> Admin | None:
     try:
         #jwt.decode checks if signature computed with SECRET_KEY matches with the one in the token,
