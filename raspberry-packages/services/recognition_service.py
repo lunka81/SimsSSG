@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from camera.camera import Camera
 from clients.uploader import recognize
 from config.config import (
+    DENIED_COOLDOWN,
     RECOGNITION_COOLDOWN,
     SEND_INTERVAL,
     USE_HARDWARE_LOCK,
@@ -29,6 +30,7 @@ class RecognitionService:
         self._latest_frame = None
         self._last_sent = None
         self._last_decision = None
+        self._cooldown = 0
 
         self._status = {
             "running": False,
@@ -183,7 +185,7 @@ class RecognitionService:
         # Kameran läses fortfarande under cooldown.
         if (
             self._last_decision is not None
-            and now - self._last_decision < RECOGNITION_COOLDOWN
+            and now - self._last_decision < self._cooldown
         ):
             return
 
@@ -254,6 +256,10 @@ class RecognitionService:
             last_error=None,
         )
         self._last_decision = time.monotonic()
+        # Kortare paus efter nekat tillträde än efter godkänt.
+        self._cooldown = (
+            RECOGNITION_COOLDOWN if result["approved"] else DENIED_COOLDOWN
+        )
 
         # Ett svar som kommer under avstängning ska inte öppna låset.
         if self._stop_event.is_set():

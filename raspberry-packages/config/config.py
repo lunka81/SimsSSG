@@ -45,8 +45,10 @@ LIVENESS_THRESHOLD = 0.5
 # Timing, in seconds
 # Minimum time between two requests to the server
 SEND_INTERVAL = 1.0
-# Pause after a successful server response before scanning again
-RECOGNITION_COOLDOWN = 5
+# Pause after an approved entry before scanning again (also how long the lock stays open)
+RECOGNITION_COOLDOWN = 6
+# Pause after a denied entry before scanning again
+DENIED_COOLDOWN = 1.5
 # How long the red LED stays on after a failed recognition
 FAIL_COOLDOWN = 2
 
