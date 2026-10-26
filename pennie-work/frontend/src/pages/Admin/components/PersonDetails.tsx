@@ -55,9 +55,6 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
     };
   }, [person.id]);
 
-  // Räknar fram statistiken från passagerna
-  const approvedCount = logs?.filter((log) => log.approved).length ?? 0;
-  const deniedCount = logs?.filter((log) => !log.approved).length ?? 0;
   // Den senaste passagen: störst tidpunkt i millisekunder
   const lastSeen = logs && logs.length > 0
     ? logs.reduce((latest, log) =>
@@ -118,16 +115,13 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
             </dd>
 
             <dt>Permission</dt>
-            <dd>{person.access}</dd>
+            <dd>{person.permission}</dd>
 
             <dt>Department</dt>
-            <dd>{person.department || "–"}</dd>
+            <dd>{person.department || "-"}</dd>
 
             <dt>Last seen</dt>
             <dd>{logs === null ? "Loading..." : lastSeen ? formatDateTime(lastSeen) : "Never"}</dd>
-
-            <dt>Entries</dt>
-            <dd>{logs === null ? "Loading..." : `${approvedCount} approved, ${deniedCount} denied`}</dd>
           </dl>
         </div>
 

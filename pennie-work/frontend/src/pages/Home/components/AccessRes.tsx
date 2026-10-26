@@ -1,11 +1,10 @@
 import "./AccessRes.css";
 
 type AccessResProps = {
-  confidence: number;
+  approved: boolean;
 };
 
-function AccessRes({ confidence }: AccessResProps) {
-  const approved = confidence >= 80;
+function AccessRes({ approved }: AccessResProps) {
 
   return (
     //ternary operator. Om approved = true så läggs klassen "approved" till annars "denied"

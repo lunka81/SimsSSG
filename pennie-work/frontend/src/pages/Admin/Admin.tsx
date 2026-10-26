@@ -1,40 +1,51 @@
-import Header from "./components/Header";
+import AdminHeader from "./components/AdminHeader";
 import Summary from "./components/Summary";
 import AddPerson from "./components/AddPerson";
 import { registerAdmin } from "../../auth";
 import { User, Check, X, ChartNoAxesColumn } from "lucide-react";
-import { createEmployee, getEmployees } from "../../api/employees";
+import { createEmployee, getEmployees, getEmployeeLogs } from "../../api/employees";
 import "./Admin.css";
 import { useState, useEffect } from "react";
 
 function Admin() {
   const [regPersons, setRegPersons] = useState<number | null>(null);
+  const [approvedToday, setApprovedToday] = useState<number | null>(null);
 
   useEffect(() => {
-    getEmployees()
-      .then((employees) => setRegPersons(employees.length))
-      .catch((error) => console.error(error));
+    async function loadStatistics() {
+      const [employees, logs] = await Promise.all([getEmployees(), getEmployeeLogs(100)]);
+      setRegPersons(employees.length);
+
+      const startOfToday = new Date();
+      startOfToday.setHours(0, 0, 0, 0);
+      const approvedLogsToday = logs.filter(
+        (log) => new Date(log.timestamp) >= startOfToday
+      );
+      setApprovedToday(approvedLogsToday.length);
+    }
+    loadStatistics().catch((error) => console.error(error));
   }, []);
 
   // Anropas av AddPerson när man klickar "Add person" och sparar personen i databasen
   async function handleAddPerson(
     name: string,
-    access: string,
-    description: string,
+    permission: string,
+    department: string,
     image: string
   ): Promise<void> {
     if (
-      access !== "Standard" &&
-      access !== "Admin" &&
-      access !== "Limited"
+      permission !== "Standard" &&
+      permission !== "Admin" &&
+      permission !== "Limited"
     ) {
       throw new Error("Invalid permission.");
     }
 
     await createEmployee({
       name,
-      permission: access,
-      description,
+      permission,
+      //heter description i backend
+      description: department,
       img: image,
     });
     setRegPersons((previous) => (previous === null ? null : previous + 1));
@@ -42,25 +53,25 @@ function Admin() {
 
   async function handleAddAdmin(
     name: string,
-    access: string,
-    description: string,
+    permission: string,
+    department: string,
     image: string,
     username: string,
     password: string,
   ): Promise<void> {
     if (
-      access !== "Standard" &&
-      access !== "Admin" &&
-      access !== "Limited"
+      permission !== "Standard" &&
+      permission !== "Admin" &&
+      permission !== "Limited"
     ) {
       throw new Error("Invalid permission.");
     }
 
     await registerAdmin({
       name,
-      permission: access,
-      description,
-      img: image,      
+      permission,
+      description: department,
+      img: image,
       username,
       plain_password: password,
     });
@@ -69,21 +80,21 @@ function Admin() {
 
   return (
     <div className="content">
-      <Header title="Admin" highlight="panel" />
+      <AdminHeader title="Admin " highlight="Panel" />
 
       {/*De fyra korten ligger i ett rutnät*/}
       <div className="event-summary">
         <Summary
           icon={<User size={28} />}
           iconClass="summary-icon"
-          value={regPersons === null ? "–" : String(regPersons)}
+          value={regPersons === null ? "-" : String(regPersons)}
           label="Registered persons"
           sub="Total"
         />
         <Summary
           icon={<Check size={28} />}
           iconClass="summary-icon approved"
-          value="18"
+          value={approvedToday === null ? "-" : String(approvedToday)}
           label="Approved entries"
           sub="Today"
         />
@@ -104,7 +115,7 @@ function Admin() {
       </div>
 
       <div className="mid-content">
-        <AddPerson onAdd={handleAddPerson} onAddAdmin={handleAddAdmin}/>
+        <AddPerson onAdd={handleAddPerson} onAddAdmin={handleAddAdmin} />
       </div>
     </div>
   );

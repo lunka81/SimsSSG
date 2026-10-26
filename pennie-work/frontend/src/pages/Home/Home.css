@@ -3,27 +3,102 @@
   min-height: 100vh;
   padding: clamp(20px, 3vh, 40px) clamp(20px, 4vw, 64px);
 }
- 
+
 .content {
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
 }
 
-/*Barnen placerias med CSS grid (kamera, databas, confidence*/
 .recognition {
   display: grid;
-  /*Mitten tar så stor plats den behöver, de andra två delar lika (fr=fraction)*/
   grid-template-columns: 1fr auto 1fr;
-  /*Centrerat inom grid*/
-  align-items: center;
   gap: clamp(20px, 4vw, 60px);
-  /*Använder hela bredden av föräldern (.content)*/
   width: 100%;
+  align-items: stretch;
 }
 
 .access-res {
   margin-top: clamp(15px, 3vh, 30px);
+}
+
+.trainings {
+  padding-top: 12px;
+  margin-top: 12px;
+  border-top: 1px solid #ff6a00;
+}
+
+.trainings h3 {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #aaa;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.training-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.training-list li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.training-check {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  background: #43a047;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+.no-match {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 24px;
+  text-align: center;
+}
+
+.no-match h3 {
+  margin: 0;
+  color: #e53935;
+}
+
+.no-match p {
+  margin: 0;
+  max-width: 280px;
+  color: #aaa;
+}
+
+.person-info {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.person-info dt {
+  color: #aaa;
+}
+
+.person-info dd {
+  margin: 0;
 }
 
 /*Används för mobila enheter*/

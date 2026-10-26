@@ -1,0 +1,36 @@
+.home-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.home-header h1 {
+  margin: 0;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: bold;
+}
+
+.home-header h1 span {
+  color: #ff6a00;
+}
+
+.home-header-line {
+  width: 55px;
+  height: 4px;
+
+  margin-top: 10px;
+
+  background: #ff6a00;
+  border-radius: 10px;
+}
+
+.home-header-company {
+  color: #ff6a00;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
+  font-style: italic;
+  letter-spacing: 1px;
+}

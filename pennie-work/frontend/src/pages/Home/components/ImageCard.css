@@ -8,12 +8,15 @@
 }
 
 .image-title {
-  margin-bottom: 10px;
+  margin-bottom: 16px;
 }
 
 .image-title span {
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: bold;
   color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 /*Rutan där bilden ligger*/
@@ -24,7 +27,7 @@
   height: clamp(220px, 40vh, 400px);
   overflow: hidden;
   border-radius: 10px;
-  background: #222;
+
 }
 
 .image-placeholder img {
@@ -33,45 +36,4 @@
 
   object-fit: cover;
   display: block;
-}
-
-.corner {
-  position: absolute;
-  width: 20px;
-  height: 20px;
-
-  border-style: solid;
-  border-color: #ff6a00;
-}
-
-.top-left {
-  top: 10px;
-  left: 10px;
-
-  border-width: 4px 0 0 4px;
-  border-radius: 6px 0 0 0;
-}
-
-.top-right {
-  top: 10px;
-  right: 10px;
-
-  border-width: 4px 4px 0 0;
-  border-radius: 0 6px 0 0;
-}
-
-.bottom-left {
-  bottom: 10px;
-  left: 10px;
-
-  border-width: 0 0 4px 4px;
-  border-radius: 0 0 0 6px;
-}
-
-.bottom-right {
-  bottom: 10px;
-  right: 10px;
-
-  border-width: 0 4px 4px 0;
-  border-radius: 0 0 6px 0;
 }
