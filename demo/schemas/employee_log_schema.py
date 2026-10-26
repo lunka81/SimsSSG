@@ -10,6 +10,7 @@ class EmployeeLogResponse(BaseModel):
 
     uuid: UUID    
     employee_uuid: UUID
+    match_score: float
     timestamp: datetime
     camera_id: str
     detection_confidence: FiniteFloat
