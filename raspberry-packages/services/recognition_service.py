@@ -31,6 +31,8 @@ class RecognitionService:
         self._last_sent = None
         self._last_decision = None
         self._cooldown = 0
+        # Time when a face was first seen after a successful recognition
+        self._first_face_at = None
 
         self._status = {
             "running": False,
@@ -41,6 +43,7 @@ class RecognitionService:
             "liveness_score": None,
             "last_response": None,
             "last_error": None,
+            "last_response_time": None,
         }
 
     def start(self):
@@ -52,6 +55,7 @@ class RecognitionService:
             self._stop_event.clear()
             self._last_sent = None
             self._last_decision = None
+            self._first_face_at = None
 
             with self._data_lock:
                 self._latest_frame = None
@@ -64,6 +68,7 @@ class RecognitionService:
                     liveness_score=None,
                     last_response=None,
                     last_error=None,
+                    last_response_time=None,
                 )
 
             self._thread = threading.Thread(
@@ -206,6 +211,10 @@ class RecognitionService:
         if face is None:
             return
 
+        # Svarstiden mäts från första upptäckta ansiktet, även över nekade försök.
+        if self._first_face_at is None:
+            self._first_face_at = now
+
         # YuNet: x, y, width, height.
         # LivenessChecker: x1, y1, x2, y2.
         x, y, width, height = [float(value) for value in face[:4]]
@@ -268,6 +277,11 @@ class RecognitionService:
         if result["approved"]:
             print("Godkänd:", result.get("name"))
             lock.unlock()
+
+            response_time = time.monotonic() - self._first_face_at
+            self._first_face_at = None
+            self._update_status(last_response_time=response_time)
+            print(f"Svarstid: {response_time:.2f} s")
         else:
             print("Tillträde nekat")
             lock.deny()
