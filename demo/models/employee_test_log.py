@@ -19,11 +19,17 @@ class EmployeeTestLog(Base):
         primary_key=True,
         default=uuid4
     )
+
     employee_uuid: Mapped[UUID] = mapped_column(
         Uuid,
         ForeignKey("employees.uuid"),
         nullable=False, #Only approved access attempts are logged
         index=True
+    )
+
+    match_score: Mapped[float] = mapped_column(
+        Float,
+        nullable=False
     )
 
     timestamp: Mapped[datetime] = mapped_column(

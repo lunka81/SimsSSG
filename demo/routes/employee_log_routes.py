@@ -14,7 +14,7 @@ log_router = APIRouter(
 )
 
 @log_router.get(
-    "/", 
+    "/",
     response_model = list[EmployeeLogResponse],
     summary="HTTP GET endpoint for getting a given number of logs created before a given timestamp.",
     description="Number of logs defaults to 30, and can be between [1, 100]."    

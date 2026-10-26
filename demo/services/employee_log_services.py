@@ -9,6 +9,7 @@ from pydantic import FiniteFloat
 def create_employee_log(
     session: Session, 
     employee: EmployeeTest, 
+    match_score: float,
     camera_id: str,
     detection_confidence: FiniteFloat,
     face_width: int,
@@ -16,6 +17,7 @@ def create_employee_log(
 ) -> EmployeeLogResponse:
 
     log = EmployeeTestLog(
+        match_score = match_score,
         camera_id = camera_id,
         detection_confidence = detection_confidence,
         face_width = face_width,

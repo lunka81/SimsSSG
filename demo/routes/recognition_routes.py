@@ -31,8 +31,15 @@ async def compare_employee(
         session, payload.embedding
     )
 
+    match_score = (comparison_services.similarity_to_match_score(
+        nearest_neighbour.similarity
+    )
+    if nearest_neighbour is not None 
+    else None
+    ) 
+
     response = comparison_services.get_compare_response(
-        session, nearest_neighbour, payload
+        session, nearest_neighbour, match_score, payload
     )
 
     #Websocket communication written by Anders. Pushed by me because Anders has some bugs he doesn't want to commit to this branch.
@@ -42,6 +49,8 @@ async def compare_employee(
         if employee is not None:
             await send_to_frontend({
                 "event": "person_recognized",
+                "match_score": match_score,
+                "approved": response.approved,
                 "person": {
                     "uuid": str(employee.uuid),
                     "name": employee.name,
@@ -56,6 +65,8 @@ async def compare_employee(
     else: 
         await send_to_frontend({
             "event": "person_not_recognized",
+            "match_score": match_score,
+            "approved": response.approved,
             "person": None
         })
     return response
