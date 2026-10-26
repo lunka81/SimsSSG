@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { BACKEND_URL, getToken } from "../../../auth";
+import { BACKEND_URL } from "../../../auth";
 
 export type Person = {
   uuid: string;
@@ -24,14 +24,9 @@ type Props = {
 
 export default function RecognitionView({ onResult }: Props) {
   useEffect(() => {
-    const token = getToken();
-    if (token === null) return;
-
     const wsUrl = BACKEND_URL.replace("http", "ws");
 
-    const socket = new WebSocket(
-      `${wsUrl}/recognition/ws?token=${encodeURIComponent(token)}`
-    );
+    const socket = new WebSocket(`${wsUrl}/recognition/ws`);
 
     socket.onmessage = (event) => {
       const data: RecognitionMessage = JSON.parse(event.data);

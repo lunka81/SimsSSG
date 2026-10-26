@@ -118,7 +118,7 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
             <dd>{person.permission}</dd>
 
             <dt>Department</dt>
-            <dd>{person.department || "–"}</dd>
+            <dd>{person.department || "-"}</dd>
 
             <dt>Last seen</dt>
             <dd>{logs === null ? "Loading..." : lastSeen ? formatDateTime(lastSeen) : "Never"}</dd>
