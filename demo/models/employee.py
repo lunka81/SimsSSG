@@ -9,7 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from demo.db.database import Base
 
 if TYPE_CHECKING:
-    from demo.models.employee_test_log import EmployeeTestLog
+    from demo.models.employee_log import EmployeeLog
     from demo.models.admin import Admin
 
 
@@ -19,7 +19,7 @@ class Permission(str, enum.Enum):
     LIMITED = "Limited"
 
 
-class EmployeeTest(Base):
+class Employee(Base):
     __tablename__ = "employees"
 
     uuid: Mapped[UUID] = mapped_column(
@@ -57,7 +57,7 @@ class EmployeeTest(Base):
         nullable=True
     )
 
-    employee_logs: Mapped[list["EmployeeTestLog"]] = relationship(
+    employee_logs: Mapped[list["EmployeeLog"]] = relationship(
         back_populates="employee",
         cascade="all, delete-orphan"
     )

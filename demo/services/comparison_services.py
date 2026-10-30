@@ -7,7 +7,7 @@ from demo.schemas.comparison_schema import NearestNeighbour, ComparisonResponse,
 from demo.services.employee_log_services import create_employee_log
 import os
 import secrets
-from demo.models.employee_test import EmployeeTest
+from demo.models.employee import Employee
 
 def validate_api_key(api_key: str | None) -> None:
     expected_key = os.environ["DEVICE_API_KEY"]
@@ -24,7 +24,7 @@ OPENCV_REC_THRESHHOLD = 0.363
 #function written by anders.
 #committed by me because we want to keep this branch as the most updated one.
 #we have used git inefficiently in this project, which we will mention in the final report.
-#generates a pseudo-accurate percentage score from the cosine similarity when comparing an embedding with the database.
+#generates a pseudo-accurate confidence score based on the cosine similarity when comparing an embedding with the database.
 def similarity_to_match_score(
     similarity: float,
     threshold: float = OPENCV_REC_THRESHHOLD,
@@ -42,11 +42,11 @@ def similarity_to_match_score(
 
 def find_nearest_neighbour(session: Session, vector: list[FiniteFloat]) -> NearestNeighbour | None:
 
-    distance = EmployeeTest.embedding.cosine_distance(vector)
+    distance = Employee.embedding.cosine_distance(vector)
     nearest_neighbour = session.execute(
         select(
-            EmployeeTest.uuid, 
-            EmployeeTest.name,
+            Employee.uuid,
+            Employee.name,
             distance.label("distance")
         ).order_by(distance).limit(1)
     ).first()
@@ -78,7 +78,7 @@ def get_compare_response(
 
     approved = nearest_neighbour.similarity >= OPENCV_REC_THRESHHOLD
     if approved:
-        employee = session.get(EmployeeTest, nearest_neighbour.uuid)
+        employee = session.get(Employee, nearest_neighbour.uuid)
         #a log is created in relation to the employee who got granted access.
         log = create_employee_log(
             session, 

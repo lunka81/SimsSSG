@@ -9,8 +9,8 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from demo.db.database import Base
 
 if TYPE_CHECKING:
-    from demo.models.employee_test_log import EmployeeTestLog
-    from demo.models.employee_test import EmployeeTest
+    from demo.models.employee_log import EmployeeLog
+    from demo.models.employee import Employee
 
 class Admin(Base):
     __tablename__ = "admin"
@@ -34,5 +34,5 @@ class Admin(Base):
 
     #__mapper_args__ = {"polymorphic_identity": "admin"}
 
-    employee: Mapped["EmployeeTest"] = relationship(back_populates="admin")
+    employee: Mapped["Employee"] = relationship(back_populates="admin")
     #relation to employee. admin should maybe be a weak entity type (can't exist unless "owned" by an employee entity.)

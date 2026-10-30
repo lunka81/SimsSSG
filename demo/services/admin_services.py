@@ -3,7 +3,7 @@ from sqlalchemy import select
 from demo.schemas.admin_schema import AdminCreate, AdminLogin, AdminResponse, AdminLoginResponse
 from demo.services.employee_services import build_employee
 from demo.models.admin import Admin
-from demo.models.employee_test import Permission
+from demo.models.employee import Permission
 
 #argon2 hash
 from pwdlib import PasswordHash

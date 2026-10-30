@@ -15,8 +15,8 @@ from sqlalchemy import text
 
 from demo.db.database import Base, engine
 #Models must be imported so Base knows about them.
-import demo.models.employee_test      
-import demo.models.employee_test_log
+import demo.models.employee
+import demo.models.employee_log
 import demo.models.admin
 
 @asynccontextmanager

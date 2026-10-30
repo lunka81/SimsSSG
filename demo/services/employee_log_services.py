@@ -1,14 +1,14 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import select
-from demo.models.employee_test_log import EmployeeTestLog
-from demo.models.employee_test import EmployeeTest
+from demo.models.employee_log import EmployeeLog
+from demo.models.employee import Employee
 from demo.schemas.employee_log_schema import EmployeeLogResponse
 from datetime import datetime
 from pydantic import FiniteFloat
 
 def create_employee_log(
     session: Session, 
-    employee: EmployeeTest, 
+    employee: Employee,
     match_score: float,
     camera_id: str,
     detection_confidence: FiniteFloat,
@@ -16,7 +16,7 @@ def create_employee_log(
     face_height: int
 ) -> EmployeeLogResponse:
 
-    log = EmployeeTestLog(
+    log = EmployeeLog(
         match_score = match_score,
         camera_id = camera_id,
         detection_confidence = detection_confidence,
@@ -39,11 +39,11 @@ def get_logs_before_timestamp(
         before: datetime | None, 
         session: Session
 ) -> list[EmployeeLogResponse]:
-    query = (select(EmployeeTestLog)
-        .order_by(EmployeeTestLog
-        .timestamp.desc())
+    query = (select(EmployeeLog)
+        .order_by(EmployeeLog
+                  .timestamp.desc())
         .limit(limit)
     )
     if before is not None:
-        query = query.where(EmployeeTestLog.timestamp < before)
+        query = query.where(EmployeeLog.timestamp < before)
     return session.scalars(query).all()

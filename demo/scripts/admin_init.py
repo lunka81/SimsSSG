@@ -11,13 +11,13 @@ from fastapi import HTTPException
 
 from demo.schemas.admin_schema import AdminCreate
 from demo.schemas.employee_schema import EmployeeCreate
-from demo.models.employee_test import Permission
+from demo.models.employee import Permission
 from demo.db.database import SessionLocal
 from demo.services.admin_services import add_admin, username_unique
 
 #Models must be imported so SQLAlchemy can resolve the relationships between them.
-import demo.models.employee_test
-import demo.models.employee_test_log
+import demo.models.employee
+import demo.models.employee_log
 import demo.models.admin
 
 #vibecoded function

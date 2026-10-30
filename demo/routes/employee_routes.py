@@ -6,14 +6,16 @@ from demo.db.database import get_session
 from demo.schemas.employee_schema import (
     EmployeeResponse, 
     EmployeeDetailResponse, 
-    EmployeeCreate
+    EmployeeCreate,
+    EmployeeUpdate,
+    EmployeeUpdateResponse
 )
 
 from demo.services.auth_services import verify_access_token
                                         
 from demo.services import employee_services
 
-from demo.models.employee_test import EmployeeTest, Permission
+from demo.models.employee import Employee, Permission
 from demo.services.img_services import image_media_type
 
 #a token has to be sent with every request to these endpoints,
@@ -74,8 +76,18 @@ def add_employee(employee: EmployeeCreate, session: Session = Depends(get_sessio
     description="Empty response body, following http conventions"
 )
 def delete_employee(emp_id: UUID, session: Session = Depends(get_session)):
-    emp = session.get(EmployeeTest, emp_id)
+    emp = session.get(Employee, emp_id)
     if emp is None: #if id isn't found cached or in db
         raise HTTPException(status_code=404, detail="Employee not found.")
     session.delete(emp)
     session.commit()
+
+#Patch endpoint and update service/schemas created by anders. Another example of our poor GitHub use. 
+@employee_router.patch(
+    "/{employee_uuid}",
+    response_model=EmployeeUpdateResponse,
+    summary="HTTP PATCH endpoint for updating an employee row.",
+    description="Attributes are optional to update and updated separately. If image is updated, embedding is too."
+)
+def update_employee(employee_uuid: UUID,employee_update: EmployeeUpdate,session: Session = Depends(get_session)):
+    return employee_services.update_employee(session,employee_uuid,employee_update)

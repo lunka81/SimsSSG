@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Header
 from fastapi import WebSocket, WebSocketDisconnect
 import base64
 from demo.services.recognition_socket import manager, send_to_frontend
-from demo.models.employee_test import EmployeeTest
+from demo.models.employee import Employee
 from demo.schemas.comparison_schema import ComparisonRequest, ComparisonResponse
 from demo.services import comparison_services, img_services
 from sqlalchemy.orm import Session
@@ -44,7 +44,7 @@ async def compare_employee(
 
     #Websocket communication written by Anders. Pushed by me because Anders has some bugs he doesn't want to commit to this branch.
     if response.employee_uuid is not None:
-        employee = session.get(EmployeeTest, response.employee_uuid)
+        employee = session.get(Employee, response.employee_uuid)
 
         if employee is not None:
             await send_to_frontend({

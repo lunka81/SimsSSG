@@ -8,10 +8,10 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from demo.db.database import Base
 
 if TYPE_CHECKING:
-    from demo.models.employee_test import EmployeeTest
+    from demo.models.employee import Employee
 
 
-class EmployeeTestLog(Base):
+class EmployeeLog(Base):
     __tablename__ = "employee_log"
     
     uuid: Mapped[UUID] = mapped_column(
@@ -58,6 +58,6 @@ class EmployeeTestLog(Base):
         nullable=False
     )
 
-    employee: Mapped["EmployeeTest"] = relationship(
+    employee: Mapped["Employee"] = relationship(
         back_populates="employee_logs"
     )
