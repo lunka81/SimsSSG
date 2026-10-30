@@ -12,7 +12,7 @@ const TRAININGS = ["Introduction Fire safety",
   "SSG Entre Contractor Safety",
   "Information security and data protection"]
 
-const RESET_DELAY_MS = 20000;
+const RESET_DELAY_MS = 6000;
 
 function Home() {
   const confidence = 80;
