@@ -1,13 +1,15 @@
 import "./AccessRes.css";
 
 type AccessResProps = {
+  /** true if access is granted, false if it is denied. */
   approved: boolean;
 };
 
+/** Green or red card that shows whether access is granted or denied. */
 function AccessRes({ approved }: AccessResProps) {
 
   return (
-    //ternary operator. Om approved = true så läggs klassen "approved" till annars "denied"
+    // Adds the class "approved" if approved is true, otherwise "denied"
     <div className={`result-card ${approved ? "approved" : "denied"}`}>
       <div className="result-icon">
         {approved ? "✓" : "✕"}

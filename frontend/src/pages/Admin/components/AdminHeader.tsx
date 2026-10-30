@@ -1,11 +1,13 @@
 import "./AdminHeader.css";
 
-// Texten som visas i rubriken. highlight är den orangea delen och kan utelämnas
 type HeaderProps = {
+  /** The text shown in the heading. */
   title: string;
+  /** Optional part of the heading that is shown in orange after the title. */
   highlight?: string;
 };
 
+/** Heading at the top of each admin page. */
 function AdminHeader({ title, highlight }: HeaderProps) {
   return (
     <header className="header">

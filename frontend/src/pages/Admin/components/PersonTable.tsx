@@ -3,7 +3,7 @@ import PersonDetails from "./PersonDetails";
 import { Search, Funnel, ChevronDown, ArrowUp, ArrowDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
-// Beskriver hur en person ser ut. export så att Admin kan använda den
+/** A person as it is shown in the admin interface. */
 export type Person = {
     id: string;
     name: string;
@@ -12,7 +12,7 @@ export type Person = {
 };
 
 type PersonTableProps = {
-    //array av personer som ska visas i tabellen
+    /** The persons to show in the table. */
     persons: Person[];
     onDelete: (id: string) => Promise<void>;
 };
@@ -20,9 +20,13 @@ type PersonTableProps = {
 type SortKey = "name" | "permission" | "department";
 type SortDirection = "asc" | "desc";
 
-// Antal personer per sida
+// Number of persons per page
 const PAGE_SIZE = 10;
 
+/**
+ * Table of persons with search, filters, sorting and pages.
+ * A click on a row opens a popup with details about the person.
+ */
 function PersonTable({ persons, onDelete }: PersonTableProps) {
     const [search, setSearch] = useState("");
     const [permissionFilter, setPermissionFilter] = useState("all");
@@ -33,13 +37,13 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const selectedPerson = persons.find((person) => person.id === selectedId);
 
-    // Hämtar alla avdelningar som finns bland personerna, utan dubbletter och tomma värden
+    // Collects all departments among the persons, without duplicates and empty values
     const departments = [...new Set(persons.map((person) => person.department))]
         .filter((name) => name !== "")
         .sort();
 
     const filteredPersons = persons.filter((person) => {
-        // Söker bara på namn
+        // Searches by name only
         const matchesSearch = person.name.toLowerCase().includes(search.toLowerCase());
 
         const matchesPermission =
@@ -51,8 +55,8 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
         return matchesSearch && matchesPermission && matchesDepartment;
     });
 
-    // Sorterar de filtrerade personerna. [...] gör en kopia så att originallistan inte ändras.
-    // Ingen vald kolumn: personerna visas i den ordning backend skickar dem (sorterade på namn)
+    // Sorts the filtered persons. [...] makes a copy so that the original list is not changed.
+    // No chosen column: the persons are shown in the order the backend sends them (sorted by name)
     const sortedPersons = sortKey === null
         ? filteredPersons
         : [...filteredPersons].sort((a, b) => {
@@ -60,13 +64,13 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
             return sortDirection === "asc" ? result : -result;
         });
 
-    // Räknar ut hur många sidor det blir och vilka personer som syns på aktuell sida
+    // Calculates the number of pages and which persons are shown on the current page
     const totalPages = Math.max(1, Math.ceil(sortedPersons.length / PAGE_SIZE));
     const currentPage = Math.min(page, totalPages);
     const start = (currentPage - 1) * PAGE_SIZE;
     const visiblePersons = sortedPersons.slice(start, start + PAGE_SIZE);
 
-    // Klick på samma rubrik vänder ordningen, klick på en ny rubrik sorterar stigande
+    // A click on the same heading reverses the order, a click on a new heading sorts ascending
     function handleSort(key: SortKey) {
         if (key === sortKey) {
             setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -77,13 +81,13 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
         setPage(1);
     }
 
-    // Visar vilken kolumn som är sorterad och åt vilket håll
+    // Shows which column is sorted and in which direction
     function sortIcon(key: SortKey) {
         if (key !== sortKey) return <ChevronsUpDown size={14} />;
         return sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
     }
 
-    // Återställer sökning, filter och sortering
+    // Resets the search, filters and sorting
     function clearFilters() {
         setSearch("");
         setPermissionFilter("all");
@@ -106,7 +110,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                     />
                 </label>
 
-                {/*Varje filter är en ruta med en liten rubrik ovanför valet*/}
+                {/* Each filter is a box with a small heading above the choice */}
                 <label className="person-table-filter">
                     <span>Permission</span>
                     <select value={permissionFilter} onChange={(e) => { setPermissionFilter(e.target.value); setPage(1); }}>
@@ -141,7 +145,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                     <table>
                         <thead>
                             <tr>
-                                {/*Kolumnrubriker. Klick sorterar på kolumnen*/}
+                                {/* Column headings. A click sorts by the column */}
                                 <th>
                                     <button type="button" className="sort-button" onClick={() => handleSort("name")}>
                                         Name {sortIcon("name")}
@@ -160,7 +164,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                             </tr>
                         </thead>
                         <tbody>
-                            {/*Går igenom alla personer i arrayen och skapar en tabellrad för varje person*/}
+                            {/* Creates one table row for each person on the current page */}
                             {visiblePersons.map((person) => (
                                 <tr key={person.id} className="person-row" onClick={() => setSelectedId(person.id)}>
                                     <td>{person.name}</td>
@@ -171,7 +175,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                         </tbody>
                     </table>
                 </div>
-                {/*Knappar för att bläddra mellan sidorna*/}
+                {/* Buttons for moving between the pages */}
                 <div className="person-table-pagination">
                     <span>
                         Showing {sortedPersons.length === 0 ? 0 : start + 1}-{start + visiblePersons.length} of {sortedPersons.length}
@@ -202,7 +206,7 @@ function PersonTable({ persons, onDelete }: PersonTableProps) {
                     </div>
                 </div>
             </div>
-            {/*Popup med detaljer om den valda personen*/}
+            {/* Popup with details about the chosen person */}
             {selectedPerson && (
                 <PersonDetails
                     person={selectedPerson}

@@ -11,37 +11,42 @@ import "./PersonDetails.css";
 type PersonDetailsProps = {
   person: Person;
   onClose: () => void;
+  /** Removes the person. Called after the admin has confirmed. */
   onDelete: (id: string) => Promise<void>;
 };
 
-// Visar datum och klockslag, t.ex. "2026-10-12 14:44"
+// Shows date and time, e.g. "2026-10-12 14:44"
 function formatDateTime(date: string) {
   return new Date(date).toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" });
 }
 
+/**
+ * Popup with details about one person: picture, ID, permission, department and
+ * the latest entry. The person can also be removed from here.
+ */
 function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
-  // Personens passager från backend. null tills svaret har kommit
+  // The person's entries from the backend. null until the response has arrived
   const [logs, setLogs] = useState<EmployeeLog[] | null>(null);
-  // Lokal adress (blob:...) till bilden. null tills bilden har hämtats
+  // Local address (blob:...) to the picture. null until the picture has been fetched
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  // Öppnar rutan när komponenten visas
+  // Opens the dialog when the component is shown
   useEffect(() => {
     const dialog = dialogRef.current;
     if (dialog && !dialog.open) dialog.showModal();
     return () => dialog?.close();
   }, []);
 
-  // Hämtar personens passager
+  // Fetches the person's entries
   useEffect(() => {
     getEmployeeDetails(person.id)
       .then((details) => setLogs(details.employee_logs))
       .catch(console.error);
   }, [person.id]);
 
-  // Hämtar bilden med token och tar bort den lokala adressen när popupen stängs
+  // Fetches the picture with the token and removes the local address when the popup closes
   useEffect(() => {
     let url: string | null = null;
     getEmployeeImage(person.id)
@@ -55,13 +60,14 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
     };
   }, [person.id]);
 
-  // Den senaste passagen: störst tidpunkt i millisekunder
+  // The latest entry: the one with the largest timestamp in milliseconds
   const lastSeen = logs && logs.length > 0
     ? logs.reduce((latest, log) =>
         new Date(log.timestamp).getTime() > new Date(latest.timestamp).getTime() ? log : latest
       ).timestamp
     : null;
 
+  // Asks for confirmation before the person is removed
   async function deletePerson() {
     if (!window.confirm(`Do you want to remove ${person.name}? This cannot be undone.`)) {
       return;
@@ -80,9 +86,9 @@ function PersonDetails({ person, onClose, onDelete }: PersonDetailsProps) {
     <dialog
       ref={dialogRef}
       className="person-details"
-      // Esc stänger rutan
+      // Esc closes the dialog
       onCancel={(e) => { e.preventDefault(); onClose(); }}
-      // Klick utanför rutan stänger den
+      // A click outside the dialog closes it
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div className="person-details-content">

@@ -8,21 +8,32 @@ import RecognitionView from "./components/Recognition";
 import type { RecognitionResult } from "./components/Recognition";
 import "./Home.css";
 
+// Example trainings shown for every recognised person.
+// Not fetched from the backend yet
 const TRAININGS = ["Introduction Fire safety",
   "SSG Entre Contractor Safety",
   "Information security and data protection"]
 
+// Time in milliseconds before the result is cleared and the view waits for the next person
 const RESET_DELAY_MS = 6000;
 
+/**
+ * The access view. Shows the result from the camera in real time: who the person is,
+ * their picture and whether access is granted or denied.
+ * Ctrl + Alt + A opens the admin login.
+ */
 function Home() {
+  // Fixed example value. The real confidence is not sent to the frontend yet
   const confidence = 80;
-  
+
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  // The latest result from the backend. null while waiting for a person
   const [result, setResult] = useState<RecognitionResult>(null);
 
   const person = result !== null && result.status === "granted" ? result.person : null;
   const denied = result !== null && result.status === "denied";
 
+  // Opens the admin login with the keyboard shortcut Ctrl + Alt + A
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
       if (e.code === "KeyA" && e.ctrlKey && e.altKey && !e.repeat) {
@@ -38,6 +49,7 @@ function Home() {
     };
   }, []);
 
+  // Clears the result after RESET_DELAY_MS. A new result restarts the timer
   useEffect(() => {
     if (result === null) return;
 

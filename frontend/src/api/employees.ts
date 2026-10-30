@@ -2,17 +2,20 @@ import { BACKEND_URL, getToken, logout } from "../auth";
 
 const API_URL = `${BACKEND_URL}/api/employee`;
 
+/** The access levels a person can have. */
 export type Permission = "Standard" | "Admin" | "Limited";
 
-// Det som skickas till backend när en ny person läggs till
+/** Data sent to the backend when a new person is added. */
 export type EmployeeCreate = {
   name: string;
   permission: Permission;
+  /** Shown as "Department" in the interface. */
   description: string | null;
-  img: string; // bilden som data-URL: "data:image/jpeg;base64,..."
+  /** The picture as a data URL: "data:image/jpeg;base64,..." */
+  img: string;
 };
 
-// Så som backend skickar tillbaka en person
+/** A person as the backend sends it back. */
 export type Employee = {
   uuid: string;
   name: string;
@@ -20,7 +23,7 @@ export type Employee = {
   description: string | null;
 };
 
-// En passage vid dörren, från loggtabellen
+/** One entry at the door, from the log table. */
 export type EmployeeLog = {
   uuid: string;
   employee_uuid: string;
@@ -31,19 +34,19 @@ export type EmployeeLog = {
   face_height: number;
 };
 
-// En person med alla sina passager
+/** A person together with all their entries. */
 type EmployeeDetails = Employee & {
   employee_logs: EmployeeLog[];
 };
 
-// Alla anrop till /api/employee kräver att token skickas med i headern Authorization
+// Every request to /api/employee must send the token in the Authorization header
 function authHeaders(): HeadersInit {
   return { Authorization: `Bearer ${getToken()}` };
 }
 
-// Kastar ett fel med ett begripligt meddelande om backend svarar med fel
+// Throws an error with a readable message if the backend responds with an error
 async function checkResponse(response: Response, message: string) {
-  // 401 betyder att token saknas eller har gått ut (den gäller i en timme)
+  // 401 means that the token is missing or has expired (it is valid for one hour)
   if (response.status === 401) {
     logout();
     throw new Error("Your session has expired. Please log in again.");
@@ -53,24 +56,38 @@ async function checkResponse(response: Response, message: string) {
   }
 }
 
-// GET /api/employee/ hämtar alla personer
+/**
+ * Fetches all registered persons (GET /api/employee/).
+ *
+ * @returns A list of all persons.
+ */
 export async function getEmployees(): Promise<Employee[]> {
   const response = await fetch(`${API_URL}/`, { headers: authHeaders() });
   await checkResponse(response, "Could not load persons");
   return response.json();
 }
 
-// GET /api/employee/{id} hämtar en person med alla passager
+/**
+ * Fetches one person together with all their entries (GET /api/employee/{id}).
+ *
+ * @param id The person's uuid.
+ */
 export async function getEmployeeDetails(id: string): Promise<EmployeeDetails> {
   const response = await fetch(`${API_URL}/${id}`, { headers: authHeaders() });
   await checkResponse(response, "Could not load the person");
   return response.json();
 }
 
-// GET /api/employee/{id}/image hämtar bilden.
-// <img src> kan inte skicka med token, så bilden hämtas med fetch och görs om till
-// en lokal adress (blob:...) som kan visas i <img>. Den ska tas bort med
-// URL.revokeObjectURL när den inte behövs längre.
+/**
+ * Fetches a person's picture (GET /api/employee/{id}/image).
+ *
+ * An <img> tag cannot send the token, so the picture is fetched with fetch and
+ * turned into a local address (blob:...) that can be shown in <img>.
+ * Remove the address with URL.revokeObjectURL when it is no longer needed.
+ *
+ * @param id The person's uuid.
+ * @returns A local address to the picture.
+ */
 export async function getEmployeeImage(id: string): Promise<string> {
   const response = await fetch(`${API_URL}/${id}/image`, { headers: authHeaders() });
   await checkResponse(response, "Could not load the picture");
@@ -78,7 +95,13 @@ export async function getEmployeeImage(id: string): Promise<string> {
   return URL.createObjectURL(blob);
 }
 
-// POST /api/employee/ lägger till en person
+/**
+ * Adds a new person (POST /api/employee/).
+ *
+ * @param employee The person's details and picture.
+ * @returns The saved person.
+ * @throws Error if no face was found in the picture (422) or the backend responds with another error.
+ */
 export async function createEmployee(employee: EmployeeCreate): Promise<Employee> {
   const response = await fetch(`${API_URL}/`, {
     method: "POST",
@@ -86,7 +109,7 @@ export async function createEmployee(employee: EmployeeCreate): Promise<Employee
     body: JSON.stringify(employee),
   });
 
-  // 422 betyder att backend inte kunde använda bilden, t.ex. inget ansikte
+  // 422 means that the backend could not use the picture, e.g. no face was found
   if (response.status === 422) {
     throw new Error("No face was found in the picture. Please try another picture.");
   }
@@ -94,7 +117,11 @@ export async function createEmployee(employee: EmployeeCreate): Promise<Employee
   return response.json();
 }
 
-// DELETE /api/employee/{id} tar bort en person
+/**
+ * Removes a person (DELETE /api/employee/{id}).
+ *
+ * @param id The person's uuid.
+ */
 export async function deleteEmployee(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
@@ -103,6 +130,12 @@ export async function deleteEmployee(id: string): Promise<void> {
   await checkResponse(response, "Could not remove the person");
 }
 
+/**
+ * Fetches the latest entries from the log (GET /api/employee_logs/).
+ *
+ * @param limit The maximum number of entries to fetch.
+ * @returns The log entries.
+ */
 export async function getEmployeeLogs(limit = 30): Promise<EmployeeLog[]> {
   const response = await fetch(`${BACKEND_URL}/api/employee_logs/?limit=${limit}`, { headers: authHeaders() });
   await checkResponse(response, "Could not load logs");

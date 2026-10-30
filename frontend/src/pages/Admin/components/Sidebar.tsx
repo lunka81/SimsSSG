@@ -8,8 +8,11 @@ import {
     ClipboardList,
 } from "lucide-react";
 
+/** Menu on the left side of the admin pages, with links to each page and a logout button. */
 function Sidebar() {
     const navigate = useNavigate();
+
+    // Removes the token and goes back to the access view
     function handleLogout() {
         logout();
         navigate("/");

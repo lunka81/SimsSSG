@@ -1,14 +1,16 @@
 import "./HomeHeader.css";
 
 type HeaderProps = {
+  /** Name of the recognised person. Left out while waiting for a person. */
   name?: string;
 };
 
+/** Heading of the access view that welcomes the recognised person. */
 function HomeHeader({ name }: HeaderProps) {
   return (
     <header className="home-header">
       <div className="home-header-left">
-        {/*span taggen används för att ge ett specifikt utseende till en del av texten */}
+        {/* The span tag gives the name its own style */}
         <h1>Welcome {name && <span>{name}</span>}!</h1>
         <div className="home-header-line"></div>
       </div>

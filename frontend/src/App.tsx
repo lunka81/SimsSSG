@@ -5,7 +5,12 @@ import Admin from "./pages/Admin/Admin";
 import Persons from "./pages/Admin/components/Persons";
 import Logbook from "./pages/Admin/components/Logbook";
 
-/*Roten i appen: bestämmer vilken sida som visas för vilken adress*/
+/**
+ * The root of the app. Decides which page is shown for which address.
+ *
+ * "/" is the access view. The pages under "/admin" share the same layout
+ * and can only be opened by a logged-in admin.
+ */
 function App() {
   return (
     <BrowserRouter>

@@ -5,10 +5,13 @@ import type { ReactNode } from "react";
 
 type ImageCardProps = {
   title: string;
+  /** Address of the picture to show. */
   image?: string;
+  /** Content shown instead of the picture. */
   children?: ReactNode;
 };
 
+/** Card with a title that shows either a picture or other content. */
 function ImageCard({
   title,
   image,

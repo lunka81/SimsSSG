@@ -4,16 +4,19 @@ import Camera from "./Camera";
 import type { CameraHandle } from "./Camera";
 
 type CameraModalProps = {
+  /** Receives the picture as a JPEG data URL. */
   onCapture: (image: string) => void;
   onClose: () => void;
 };
 
+/** Popup where the admin takes a profile picture with the webcam. */
 function CameraModal({ onCapture, onClose }: CameraModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const cameraRef = useRef<CameraHandle>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => { 
+  // Opens the dialog when the component is shown and closes it when it is removed
+  useEffect(() => {
     const dialog = dialogRef.current;
 
     if (dialog && !dialog.open) {
@@ -30,6 +33,7 @@ function CameraModal({ onCapture, onClose }: CameraModalProps) {
     onClose();
   }
 
+  // Takes a picture, turns off the camera and sends the picture to the parent component
   function takePicture() {
     const image = cameraRef.current?.takeSnapshot();
 
