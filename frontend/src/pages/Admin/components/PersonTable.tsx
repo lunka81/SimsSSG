@@ -1,221 +1,375 @@
 import "./PersonTable.css";
 import PersonDetails from "./PersonDetails";
-import { Search, Funnel, ChevronDown, ArrowUp, ArrowDown, ChevronsUpDown, ChevronLeft, ChevronRight } from "lucide-react";
+import type { PersonDetailsUpdate } from "./PersonDetails";
+import {
+  PERMISSIONS,
+  updateEmployee,
+  type Employee,
+  type Permission,
+} from "../../../api/employees";
+import {
+  Search,
+  Funnel,
+  ChevronDown,
+  ArrowUp,
+  ArrowDown,
+  ChevronsUpDown,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 import { useState } from "react";
 
-/** A person as it is shown in the admin interface. */
 export type Person = {
-    id: string;
-    name: string;
-    permission: string;
-    department: string;
+  id: string;
+  name: string;
+  access: string;
+  department: string;
 };
 
 type PersonTableProps = {
-    /** The persons to show in the table. */
-    persons: Person[];
-    onDelete: (id: string) => Promise<void>;
+  persons: Person[];
+  onDelete: (id: string) => Promise<void>;
+
+  // Kan användas för att även uppdatera listan i Admin.
+  onUpdated?: (person: Person) => void;
 };
 
-type SortKey = "name" | "permission" | "department";
+type SortKey = "name" | "access" | "department";
 type SortDirection = "asc" | "desc";
 
-// Number of persons per page
 const PAGE_SIZE = 10;
 
-/**
- * Table of persons with search, filters, sorting and pages.
- * A click on a row opens a popup with details about the person.
- */
-function PersonTable({ persons, onDelete }: PersonTableProps) {
-    const [search, setSearch] = useState("");
-    const [permissionFilter, setPermissionFilter] = useState("all");
-    const [departmentFilter, setDepartmentFilter] = useState("all");
-    const [sortKey, setSortKey] = useState<SortKey | null>(null);
-    const [sortDirection, setSortDirection] = useState<SortDirection>("asc");
-    const [page, setPage] = useState(1);
-    const [selectedId, setSelectedId] = useState<string | null>(null);
-    const selectedPerson = persons.find((person) => person.id === selectedId);
+function toPerson(employee: Employee): Person {
+  return {
+    id: employee.uuid,
+    name: employee.name,
+    access: employee.permission,
+    department: employee.description ?? "",
+  };
+}
 
-    // Collects all departments among the persons, without duplicates and empty values
-    const departments = [...new Set(persons.map((person) => person.department))]
-        .filter((name) => name !== "")
-        .sort();
+function isPermission(value: string): value is Permission {
+  return PERMISSIONS.some((permission) => permission === value);
+}
 
-    const filteredPersons = persons.filter((person) => {
-        // Searches by name only
-        const matchesSearch = person.name.toLowerCase().includes(search.toLowerCase());
+function PersonTable({
+  persons,
+  onDelete,
+  onUpdated,
+}: PersonTableProps) {
+  const [search, setSearch] = useState("");
+  const [permission, setPermission] = useState("all");
+  const [department, setDepartment] = useState("all");
+  const [sortKey, setSortKey] = useState<SortKey | null>(null);
+  const [sortDirection, setSortDirection] =
+    useState<SortDirection>("asc");
+  const [page, setPage] = useState(1);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
-        const matchesPermission =
-            permissionFilter === "all" || person.permission === permissionFilter;
+  // Visar sparade ändringar direkt även utan onUpdated från Admin.
+  const [updatedPersons, setUpdatedPersons] =
+    useState<Record<string, Person>>({});
 
-        const matchesDepartment =
-            departmentFilter === "all" || person.department === departmentFilter;
+  const currentPersons = persons.map(
+    (person) => updatedPersons[person.id] ?? person
+  );
 
-        return matchesSearch && matchesPermission && matchesDepartment;
-    });
+  const selectedPerson = currentPersons.find(
+    (person) => person.id === selectedId
+  );
 
-    // Sorts the filtered persons. [...] makes a copy so that the original list is not changed.
-    // No chosen column: the persons are shown in the order the backend sends them (sorted by name)
-    const sortedPersons = sortKey === null
-        ? filteredPersons
-        : [...filteredPersons].sort((a, b) => {
-            const result = a[sortKey].localeCompare(b[sortKey], "sv");
-            return sortDirection === "asc" ? result : -result;
+  const departments = [
+    ...new Set(currentPersons.map((person) => person.department)),
+  ]
+    .filter((name) => name.trim() !== "")
+    .sort();
+
+  const filteredPersons = currentPersons.filter((person) => {
+    const matchesSearch = person.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+
+    const matchesPermission =
+      permission === "all" || person.access === permission;
+
+    const matchesDepartment =
+      department === "all" || person.department === department;
+
+    return matchesSearch && matchesPermission && matchesDepartment;
+  });
+
+  const sortedPersons =
+    sortKey === null
+      ? filteredPersons
+      : [...filteredPersons].sort((a, b) => {
+          const result = a[sortKey].localeCompare(b[sortKey], "sv");
+
+          return sortDirection === "asc" ? result : -result;
         });
 
-    // Calculates the number of pages and which persons are shown on the current page
-    const totalPages = Math.max(1, Math.ceil(sortedPersons.length / PAGE_SIZE));
-    const currentPage = Math.min(page, totalPages);
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const visiblePersons = sortedPersons.slice(start, start + PAGE_SIZE);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedPersons.length / PAGE_SIZE)
+  );
 
-    // A click on the same heading reverses the order, a click on a new heading sorts ascending
-    function handleSort(key: SortKey) {
-        if (key === sortKey) {
-            setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-        } else {
-            setSortKey(key);
-            setSortDirection("asc");
-        }
-        setPage(1);
+  const currentPage = Math.min(page, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const visiblePersons = sortedPersons.slice(
+    start,
+    start + PAGE_SIZE
+  );
+
+  function handleSort(key: SortKey) {
+    if (key === sortKey) {
+      setSortDirection((current) =>
+        current === "asc" ? "desc" : "asc"
+      );
+    } else {
+      setSortKey(key);
+      setSortDirection("asc");
     }
 
-    // Shows which column is sorted and in which direction
-    function sortIcon(key: SortKey) {
-        if (key !== sortKey) return <ChevronsUpDown size={14} />;
-        return sortDirection === "asc" ? <ArrowUp size={14} /> : <ArrowDown size={14} />;
+    setPage(1);
+  }
+
+  function sortIcon(key: SortKey) {
+    if (key !== sortKey) {
+      return <ChevronsUpDown size={14} />;
     }
 
-    // Resets the search, filters and sorting
-    function clearFilters() {
-        setSearch("");
-        setPermissionFilter("all");
-        setDepartmentFilter("all");
-        setSortKey(null);
-        setSortDirection("asc");
-        setPage(1);
-    }
-
-    return (
-        <section className="person-table">
-            <div className="person-table-toolbar">
-                <label className="person-table-search">
-                    <Search size={18} />
-                    <input
-                        type="text"
-                        placeholder="Search by name..."
-                        value={search}
-                        onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                    />
-                </label>
-
-                {/* Each filter is a box with a small heading above the choice */}
-                <label className="person-table-filter">
-                    <span>Permission</span>
-                    <select value={permissionFilter} onChange={(e) => { setPermissionFilter(e.target.value); setPage(1); }}>
-                        <option value="all">All</option>
-                        <option value="Standard">Standard</option>
-                        <option value="Admin">Admin</option>
-                        <option value="Limited">Limited</option>
-                    </select>
-                    <ChevronDown size={16} className="filter-arrow" />
-                </label>
-
-                <label className="person-table-filter">
-                    <span>Department</span>
-                    <select value={departmentFilter} onChange={(e) => { setDepartmentFilter(e.target.value); setPage(1); }}>
-                        <option value="all">All</option>
-                        {departments.map((name) => (
-                            <option key={name} value={name}>{name}</option>
-                        ))}
-                    </select>
-                    <ChevronDown size={16} className="filter-arrow" />
-                </label>
-
-                <button type="button" className="person-table-clear" onClick={clearFilters}>
-                    <Funnel size={16} />
-                    Clear filters
-                </button>
-            </div>
-            <div className="person-table-card">
-                <h2>{filteredPersons.length} of {persons.length} persons</h2>
-
-                <div className="person-table-wrapper">
-                    <table>
-                        <thead>
-                            <tr>
-                                {/* Column headings. A click sorts by the column */}
-                                <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("name")}>
-                                        Name {sortIcon("name")}
-                                    </button>
-                                </th>
-                                <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("permission")}>
-                                        Permission {sortIcon("permission")}
-                                    </button>
-                                </th>
-                                <th>
-                                    <button type="button" className="sort-button" onClick={() => handleSort("department")}>
-                                        Department {sortIcon("department")}
-                                    </button>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {/* Creates one table row for each person on the current page */}
-                            {visiblePersons.map((person) => (
-                                <tr key={person.id} className="person-row" onClick={() => setSelectedId(person.id)}>
-                                    <td>{person.name}</td>
-                                    <td>{person.permission}</td>
-                                    <td>{person.department}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-                {/* Buttons for moving between the pages */}
-                <div className="person-table-pagination">
-                    <span>
-                        Showing {sortedPersons.length === 0 ? 0 : start + 1}-{start + visiblePersons.length} of {sortedPersons.length}
-                    </span>
-
-                    <div className="pagination-buttons">
-                        <button
-                            type="button"
-                            className="icon-button"
-                            title="Previous page"
-                            disabled={currentPage === 1}
-                            onClick={() => setPage(currentPage - 1)}
-                        >
-                            <ChevronLeft size={16} />
-                        </button>
-
-                        <span>Page {currentPage} of {totalPages}</span>
-
-                        <button
-                            type="button"
-                            className="icon-button"
-                            title="Next page"
-                            disabled={currentPage === totalPages}
-                            onClick={() => setPage(currentPage + 1)}
-                        >
-                            <ChevronRight size={16} />
-                        </button>
-                    </div>
-                </div>
-            </div>
-            {/* Popup with details about the chosen person */}
-            {selectedPerson && (
-                <PersonDetails
-                    person={selectedPerson}
-                    onClose={() => setSelectedId(null)}
-                    onDelete={onDelete}
-                />
-            )}
-        </section>
+    return sortDirection === "asc" ? (
+      <ArrowUp size={14} />
+    ) : (
+      <ArrowDown size={14} />
     );
+  }
+
+  function clearFilters() {
+    setSearch("");
+    setPermission("all");
+    setDepartment("all");
+    setSortKey(null);
+    setSortDirection("asc");
+    setPage(1);
+  }
+
+  async function handleSavePerson(
+    id: string,
+    changes: PersonDetailsUpdate
+  ): Promise<void> {
+    if (!isPermission(changes.access)) {
+      throw new Error("Select a valid permission.");
+    }
+
+    // Mappar formulärets fält till backendens schema.
+    const employee = await updateEmployee(id, {
+      name: changes.name,
+      permission: changes.access,
+      description: changes.department,
+      ...(changes.image !== undefined
+        ? { img: changes.image }
+        : {}),
+    });
+
+    const updatedPerson = toPerson(employee);
+
+    setUpdatedPersons((current) => ({
+      ...current,
+      [id]: updatedPerson,
+    }));
+
+    onUpdated?.(updatedPerson);
+
+    // PersonDetails stänger dialogen efter lyckad sparning.
+    // Om PATCH misslyckas kastas felet vidare till dialogen.
+  }
+
+  async function handleDeletePerson(id: string): Promise<void> {
+    await onDelete(id);
+
+    setUpdatedPersons((current) => {
+      const next = { ...current };
+      delete next[id];
+      return next;
+    });
+
+    setSelectedId(null);
+  }
+
+  return (
+    <section className="person-table">
+      <div className="person-table-toolbar">
+        <label className="person-table-search">
+          <Search size={18} />
+
+          <input
+            type="text"
+            placeholder="Search by name..."
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(1);
+            }}
+          />
+        </label>
+
+        <label className="person-table-filter">
+          <span>Permission</span>
+
+          <select
+            value={permission}
+            onChange={(event) => {
+              setPermission(event.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="all">All</option>
+
+            {PERMISSIONS.map((role) => (
+              <option key={role} value={role}>
+                {role}
+              </option>
+            ))}
+          </select>
+
+          <ChevronDown size={16} className="filter-arrow" />
+        </label>
+
+        <label className="person-table-filter">
+          <span>Department</span>
+
+          <select
+            value={department}
+            onChange={(event) => {
+              setDepartment(event.target.value);
+              setPage(1);
+            }}
+          >
+            <option value="all">All</option>
+
+            {departments.map((name) => (
+              <option key={name} value={name}>
+                {name}
+              </option>
+            ))}
+          </select>
+
+          <ChevronDown size={16} className="filter-arrow" />
+        </label>
+
+        <button
+          type="button"
+          className="person-table-clear"
+          onClick={clearFilters}
+        >
+          <Funnel size={16} />
+          Clear filters
+        </button>
+      </div>
+
+      <div className="person-table-card">
+        <h2>
+          {filteredPersons.length} of {currentPersons.length} persons
+        </h2>
+
+        <div className="person-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>
+                  <button
+                    type="button"
+                    className="sort-button"
+                    onClick={() => handleSort("name")}
+                  >
+                    Name {sortIcon("name")}
+                  </button>
+                </th>
+
+                <th>
+                  <button
+                    type="button"
+                    className="sort-button"
+                    onClick={() => handleSort("access")}
+                  >
+                    Permission {sortIcon("access")}
+                  </button>
+                </th>
+
+                <th>
+                  <button
+                    type="button"
+                    className="sort-button"
+                    onClick={() => handleSort("department")}
+                  >
+                    Department {sortIcon("department")}
+                  </button>
+                </th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {visiblePersons.map((person) => (
+                <tr
+                  key={person.id}
+                  className="person-row"
+                  onClick={() => setSelectedId(person.id)}
+                >
+                  <td>{person.name}</td>
+                  <td>{person.access}</td>
+                  <td>{person.department}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="person-table-pagination">
+          <span>
+            Showing {sortedPersons.length === 0 ? 0 : start + 1}–
+            {start + visiblePersons.length} of {sortedPersons.length}
+          </span>
+
+          <div className="pagination-buttons">
+            <button
+              type="button"
+              className="icon-button"
+              title="Previous page"
+              disabled={currentPage === 1}
+              onClick={() => setPage(currentPage - 1)}
+            >
+              <ChevronLeft size={16} />
+            </button>
+
+            <span>
+              Page {currentPage} of {totalPages}
+            </span>
+
+            <button
+              type="button"
+              className="icon-button"
+              title="Next page"
+              disabled={currentPage === totalPages}
+              onClick={() => setPage(currentPage + 1)}
+            >
+              <ChevronRight size={16} />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {selectedPerson && (
+        <PersonDetails
+          key={selectedPerson.id}
+          person={selectedPerson}
+          permissionOptions={PERMISSIONS}
+          onClose={() => setSelectedId(null)}
+          onDelete={handleDeletePerson}
+          onSave={handleSavePerson}
+        />
+      )}
+    </section>
+  );
 }
 
 export default PersonTable;

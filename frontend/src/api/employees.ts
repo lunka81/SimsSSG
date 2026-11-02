@@ -2,20 +2,32 @@ import { BACKEND_URL, getToken, logout } from "../auth";
 
 const API_URL = `${BACKEND_URL}/api/employee`;
 
-/** The access levels a person can have. */
 export type Permission = "Standard" | "Admin" | "Limited";
 
-/** Data sent to the backend when a new person is added. */
+export const PERMISSIONS: readonly Permission[] = [
+  "Standard",
+  "Admin",
+  "Limited",
+];
+
+// Data för att skapa en person.
 export type EmployeeCreate = {
   name: string;
   permission: Permission;
-  /** Shown as "Department" in the interface. */
   description: string | null;
-  /** The picture as a data URL: "data:image/jpeg;base64,..." */
   img: string;
 };
 
-/** A person as the backend sends it back. */
+// Data för att uppdatera en person.
+// Bara fälten som skickas ändras.
+export type EmployeeUpdate = {
+  name?: string;
+  permission?: Permission;
+  description?: string | null;
+  img?: string;
+};
+
+// Personuppgifter från backend.
 export type Employee = {
   uuid: string;
   name: string;
@@ -23,7 +35,7 @@ export type Employee = {
   description: string | null;
 };
 
-/** One entry at the door, from the log table. */
+// En passage vid dörren.
 export type EmployeeLog = {
   uuid: string;
   employee_uuid: string;
@@ -34,108 +46,149 @@ export type EmployeeLog = {
   face_height: number;
 };
 
-/** A person together with all their entries. */
-type EmployeeDetails = Employee & {
+export type EmployeeDetails = Employee & {
   employee_logs: EmployeeLog[];
 };
 
-// Every request to /api/employee must send the token in the Authorization header
-function authHeaders(): HeadersInit {
-  return { Authorization: `Bearer ${getToken()}` };
+function authHeaders(): Record<string, string> {
+  return {
+    Authorization: `Bearer ${getToken()}`,
+  };
 }
 
-// Throws an error with a readable message if the backend responds with an error
-async function checkResponse(response: Response, message: string) {
-  // 401 means that the token is missing or has expired (it is valid for one hour)
+async function checkResponse(
+  response: Response,
+  message: string
+): Promise<void> {
   if (response.status === 401) {
     logout();
-    throw new Error("Your session has expired. Please log in again.");
+    throw new Error(
+      "Your session has expired. Please log in again."
+    );
   }
-  if (!response.ok) {
-    throw new Error(`${message} (${response.status}).`);
+
+  if (response.ok) {
+    return;
   }
+
+  // Försök visa backendens förklaring.
+  let detailMessage = "";
+
+  try {
+    const body = await response.json();
+    const detail: unknown = body.detail;
+
+    if (typeof detail === "string") {
+      detailMessage = detail;
+    } else if (Array.isArray(detail)) {
+      // FastAPI:s valideringsfel.
+      detailMessage = detail
+        .map((item: unknown) => {
+          if (
+            typeof item === "object" &&
+            item !== null &&
+            "msg" in item &&
+            typeof item.msg === "string"
+          ) {
+            return item.msg;
+          }
+
+          return "";
+        })
+        .filter(Boolean)
+        .join("; ");
+    }
+  } catch {
+    // Använd standardmeddelandet om svaret inte är JSON.
+  }
+
+  throw new Error(
+    detailMessage || `${message} (${response.status}).`
+  );
 }
 
-/**
- * Fetches all registered persons (GET /api/employee/).
- *
- * @returns A list of all persons.
- */
+// GET /api/employee/
 export async function getEmployees(): Promise<Employee[]> {
-  const response = await fetch(`${API_URL}/`, { headers: authHeaders() });
+  const response = await fetch(`${API_URL}/`, {
+    headers: authHeaders(),
+  });
+
   await checkResponse(response, "Could not load persons");
   return response.json();
 }
 
-/**
- * Fetches one person together with all their entries (GET /api/employee/{id}).
- *
- * @param id The person's uuid.
- */
-export async function getEmployeeDetails(id: string): Promise<EmployeeDetails> {
-  const response = await fetch(`${API_URL}/${id}`, { headers: authHeaders() });
+// GET /api/employee/{id}
+export async function getEmployeeDetails(
+  id: string
+): Promise<EmployeeDetails> {
+  const response = await fetch(`${API_URL}/${id}`, {
+    headers: authHeaders(),
+  });
+
   await checkResponse(response, "Could not load the person");
   return response.json();
 }
 
-/**
- * Fetches a person's picture (GET /api/employee/{id}/image).
- *
- * An <img> tag cannot send the token, so the picture is fetched with fetch and
- * turned into a local address (blob:...) that can be shown in <img>.
- * Remove the address with URL.revokeObjectURL when it is no longer needed.
- *
- * @param id The person's uuid.
- * @returns A local address to the picture.
- */
-export async function getEmployeeImage(id: string): Promise<string> {
-  const response = await fetch(`${API_URL}/${id}/image`, { headers: authHeaders() });
+// GET /api/employee/{id}/image
+// Anroparen ansvarar för URL.revokeObjectURL när bilden inte behövs.
+export async function getEmployeeImage(
+  id: string
+): Promise<string> {
+  const response = await fetch(`${API_URL}/${id}/image`, {
+    headers: authHeaders(),
+  });
+
   await checkResponse(response, "Could not load the picture");
+
   const blob = await response.blob();
   return URL.createObjectURL(blob);
 }
 
-/**
- * Adds a new person (POST /api/employee/).
- *
- * @param employee The person's details and picture.
- * @returns The saved person.
- * @throws Error if no face was found in the picture (422) or the backend responds with another error.
- */
-export async function createEmployee(employee: EmployeeCreate): Promise<Employee> {
+// POST /api/employee/
+export async function createEmployee(
+  employee: EmployeeCreate
+): Promise<Employee> {
   const response = await fetch(`${API_URL}/`, {
     method: "POST",
-    headers: { ...authHeaders(), "Content-Type": "application/json" },
+    headers: {
+      ...authHeaders(),
+      "Content-Type": "application/json",
+    },
     body: JSON.stringify(employee),
   });
 
-  // 422 means that the backend could not use the picture, e.g. no face was found
-  if (response.status === 422) {
-    throw new Error("No face was found in the picture. Please try another picture.");
-  }
   await checkResponse(response, "Could not save the person");
   return response.json();
 }
 
-/**
- * Removes a person (DELETE /api/employee/{id}).
- *
- * @param id The person's uuid.
- */
+// PATCH /api/employee/{id}
+export async function updateEmployee(
+  id: string,
+  changes: EmployeeUpdate
+): Promise<Employee> {
+  const response = await fetch(`${API_URL}/${id}`, {
+    method: "PATCH",
+    headers: {
+      ...authHeaders(),
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(changes),
+  });
+
+  await checkResponse(response, "Could not update the person");
+  return response.json();
+}
+
+// DELETE /api/employee/{id}
 export async function deleteEmployee(id: string): Promise<void> {
   const response = await fetch(`${API_URL}/${id}`, {
     method: "DELETE",
     headers: authHeaders(),
   });
+
   await checkResponse(response, "Could not remove the person");
 }
 
-/**
- * Fetches the latest entries from the log (GET /api/employee_logs/).
- *
- * @param limit The maximum number of entries to fetch.
- * @returns The log entries.
- */
 export async function getEmployeeLogs(limit = 30): Promise<EmployeeLog[]> {
   const response = await fetch(`${BACKEND_URL}/api/employee_logs/?limit=${limit}`, { headers: authHeaders() });
   await checkResponse(response, "Could not load logs");

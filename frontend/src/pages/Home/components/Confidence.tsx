@@ -1,22 +1,20 @@
 import "./Confidence.css";
 
 type ConfidenceProps = {
-  /** The confidence in percent, 0–100. */
   value: number;
 };
 
-/** Circle that shows how confident the recognition is. */
 function Confidence({ value }: ConfidenceProps) {
   return (
     <div className="confidence">
       <div
         className="confidence-circle"
-        // Creates a CSS variable that the CSS file uses to fill the circle with colour
+        //skapar en variabel i som används i CSS filen för att fylla cirkeln med färg
         style={{ "--confidence": `${value}%` } as React.CSSProperties}
 >
         <div className="confidence-inner">
           <span className="confidence-value">{value}%</span>
-          <span className="confidence-text">Confidence</span>
+          <span className="confidence-text">Match score</span>
         </div>
       </div>
     </div>

@@ -1,21 +1,19 @@
 import { useEffect, useRef, useState } from "react";
-
+import { Camera as CameraIcon, X } from "lucide-react";
 import Camera from "./Camera";
 import type { CameraHandle } from "./Camera";
+import "./CameraModal.css";
 
 type CameraModalProps = {
-  /** Receives the picture as a JPEG data URL. */
   onCapture: (image: string) => void;
   onClose: () => void;
 };
 
-/** Popup where the admin takes a profile picture with the webcam. */
 function CameraModal({ onCapture, onClose }: CameraModalProps) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const cameraRef = useRef<CameraHandle>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Opens the dialog when the component is shown and closes it when it is removed
   useEffect(() => {
     const dialog = dialogRef.current;
 
@@ -24,6 +22,7 @@ function CameraModal({ onCapture, onClose }: CameraModalProps) {
     }
 
     return () => {
+      cameraRef.current?.stopCamera();
       dialog?.close();
     };
   }, []);
@@ -33,7 +32,6 @@ function CameraModal({ onCapture, onClose }: CameraModalProps) {
     onClose();
   }
 
-  // Takes a picture, turns off the camera and sends the picture to the parent component
   function takePicture() {
     const image = cameraRef.current?.takeSnapshot();
 
@@ -51,38 +49,66 @@ function CameraModal({ onCapture, onClose }: CameraModalProps) {
   return (
     <dialog
       ref={dialogRef}
+      className="camera-modal"
       aria-labelledby="camera-title"
       onCancel={(event) => {
         event.preventDefault();
+        event.stopPropagation();
         closeCamera();
       }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) {
+          closeCamera();
+        }
+      }}
     >
-      
+      <div className="camera-modal-content">
+        <div className="camera-modal-header">
+          <div>
+            <h2 id="camera-title">Take photo</h2>
+            <p>Position your face in the centre of the camera.</p>
+          </div>
 
-      <div className="camera-container">
-        <Camera ref={cameraRef} autoStart />
+          <button
+            type="button"
+            className="icon-button"
+            title="Close camera"
+            aria-label="Close camera"
+            onClick={closeCamera}
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="camera-modal-preview">
+          <Camera ref={cameraRef} autoStart />
+        </div>
+
+        {error && (
+          <p className="camera-modal-error" role="alert">
+            {error}
+          </p>
+        )}
+
+        <div className="camera-modal-footer">
+          <button
+            type="button"
+            className="button-secondary"
+            onClick={closeCamera}
+          >
+            Cancel
+          </button>
+
+          <button
+            type="button"
+            className="button-primary"
+            onClick={takePicture}
+          >
+            <CameraIcon size={16} />
+            Take picture
+          </button>
+        </div>
       </div>
-
-      {error && <p role="alert">{error}</p>}
-
-      <button
-        type="button"
-        className="button-primary"
-        onClick={takePicture}
-
-        style={{
-          marginRight: "5px"
-        }}
-          
-      >
-        Take Picture
-      </button>
-
-      <button type="button" 
-        className="button-secondary"
-        onClick={closeCamera}>
-        Cancel
-      </button>
     </dialog>
   );
 }
