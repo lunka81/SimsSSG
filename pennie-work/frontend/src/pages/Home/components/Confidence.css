@@ -1,0 +1,64 @@
+.confidence {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confidence-circle {
+  width: 200px;
+  /*Förhållande höjd och bredd 1:1*/
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+
+  background: conic-gradient(
+    #ff6a00 0% var(--confidence),
+    #292929 var(--confidence) 100%
+  );
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confidence-inner {
+  width: 165px;
+  aspect-ratio: 1;
+
+  border-radius: 50%;
+  background: #080808;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.confidence-value {
+  font-size: 42px;
+  font-weight: bold;
+}
+
+.confidence-text {
+  font-size: 16px;
+  color: #aaa;
+}
+
+/*Används för mobila enheter*/
+@media (max-width: 800px) {
+  .confidence-circle {
+    width: 160px;
+  }
+
+  .confidence-inner {
+    width: 132px;
+  }
+
+  .confidence-value {
+    font-size: 32px;
+  }
+
+  .confidence-text {
+    font-size: 14px;
+  }
+}

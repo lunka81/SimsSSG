@@ -1,0 +1,6 @@
+.camera-container {
+    width: min(480px, 80vw);
+    height: 360px;
+    background: #111;
+    marginBottom: 50px;
+}

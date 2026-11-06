@@ -1,0 +1,14 @@
+.venv/
+venv/
+.env
+__pycache__/
+*.pyc
+*.exe
+.idea/workspace.xml
+*.onnx
+test_identify.py
+__pycache__/
+.idea/
+# Unfinished model download, see recognition/model_files.py
+*.part
+model_weights/
