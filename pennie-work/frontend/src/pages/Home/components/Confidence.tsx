@@ -14,7 +14,7 @@ function Confidence({ value }: ConfidenceProps) {
 >
         <div className="confidence-inner">
           <span className="confidence-value">{value}%</span>
-          <span className="confidence-text">Confidence</span>
+          <span className="confidence-text">Match score</span>
         </div>
       </div>
     </div>

@@ -6,8 +6,8 @@ import { Camera } from "lucide-react";
 import CameraModal from "./CameraModal";
 
 
-// Tar emot en funktion från Admin som lägger till personen i listan
 type AddPersonProps = {
+    /** Saves a person with the Standard or Limited permission. */
     onAdd: (
         name: string,
         permission: string,
@@ -15,6 +15,7 @@ type AddPersonProps = {
         image: string,
     ) => Promise<void>;
 
+    /** Saves a person with the Admin permission together with a username and password. */
     onAddAdmin: (
         name: string,
         permission: string,
@@ -25,6 +26,7 @@ type AddPersonProps = {
     ) => Promise<void>;
 };
 
+// A new admin whose details are saved while the login details are entered in a popup
 type PendingAdmin = {
     name: string;
     permission: string;
@@ -32,7 +34,12 @@ type PendingAdmin = {
     image: string;
 };
 
+/**
+ * Form for adding a new person. The picture can be uploaded as a file or taken with the webcam.
+ * If the Admin permission is chosen, a popup asks for a username and password before saving.
+ */
 function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
+    // The chosen picture as a data URL, shown as a preview and sent to the backend
     const [imagePreview, setImagePreview] = useState<string | null>(null);
     const [cameraOpen, setCameraOpen] = useState(false);
     const [saving, setSaving] = useState(false);
@@ -40,6 +47,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
     const [pendingAdmin, setPendingAdmin] = useState<PendingAdmin | null>(null);
     const formRef = useRef<HTMLFormElement>(null);
 
+    // Reads the uploaded file and converts it to a data URL
     function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
         const file = e.target.files?.[0];
         if (!file) return;
@@ -58,7 +66,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         e.preventDefault();
         if (saving) return;
 
-        // Spara referensen före await.
+        // Save the reference before await, since e.currentTarget is null afterwards
         const form = e.currentTarget;
         const formData = new FormData(form);
 
@@ -71,6 +79,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
             return;
         }
 
+        // An admin also needs login details, so open the popup instead of saving directly
         if (permission === "Admin") {
             setError(null);
             setPendingAdmin({ name, permission, department, image: imagePreview });
@@ -83,7 +92,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         try {
             await onAdd(name, permission, department, imagePreview);
 
-            // Töm först när backend har sparat personen.
+            // Clear the form only after the backend has saved the person
             form.reset();
             setImagePreview(null);
         } catch (error) {
@@ -95,6 +104,7 @@ function AddPerson({ onAdd, onAddAdmin }: AddPersonProps) {
         }
     }
 
+    // Called by the popup when the login details have been entered. Saves the admin
     async function handleAdminConfirm(username: string, password: string): Promise<void> {
         if (pendingAdmin === null) return;
         await onAddAdmin(

@@ -6,6 +6,7 @@ import "./PersonTable.css";
 import "../Admin.css";
 import "./Logbook.css";
 
+// One row in the logbook: an entry together with the person's name and permission
 type LogEntry = {
     id: string;
     timestamp: string;
@@ -14,18 +15,24 @@ type LogEntry = {
     permission: string;
 }
 
+// Number of rows per page
 const PAGE_SIZE = 10;
+// Number of entries fetched from the backend
 const MAX_ENTRIES = 40;
 
+// Shows date and time, e.g. "2026-10-12 14:44"
 function formatDateTime(date: string) {
     return new Date(date).toLocaleString("sv-SE", { dateStyle: "short", timeStyle: "short" });
 }
 
+/** Admin page that shows the latest entries at the door. */
 function Logbook() {
     const [entries, setEntries] = useState<LogEntry[]>([]);
     const [error, setError] = useState<string | null>(null);
     const [page, setPage] = useState(1);
 
+    // The log only contains the person's uuid, so all persons are fetched
+    // as well to show the name and permission for each entry
     useEffect(() => {
         async function loadLogs() {
             const [employees, logs] = await Promise.all([getEmployees(), getEmployeeLogs(MAX_ENTRIES)]);
@@ -46,6 +53,7 @@ function Logbook() {
         loadLogs().catch((error) => setError(error.message));
     }, []);
 
+    // Calculates the number of pages and which entries are shown on the current page
     const totalPages = Math.max(1, Math.ceil(entries.length / PAGE_SIZE));
     const currentPage = Math.min(page, totalPages);
     const start = (currentPage - 1) * PAGE_SIZE;

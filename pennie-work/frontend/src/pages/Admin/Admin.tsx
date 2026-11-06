@@ -7,10 +7,16 @@ import { createEmployee, getEmployees, getEmployeeLogs } from "../../api/employe
 import "./Admin.css";
 import { useState, useEffect } from "react";
 
+/**
+ * Start page of the admin interface. Shows statistics and the form for adding a new person.
+ */
 function Admin() {
+  // null until the statistics have been loaded from the backend
   const [regPersons, setRegPersons] = useState<number | null>(null);
   const [approvedToday, setApprovedToday] = useState<number | null>(null);
 
+  // Loads the number of registered persons and counts how many of the
+  // latest 100 entries were made today
   useEffect(() => {
     async function loadStatistics() {
       const [employees, logs] = await Promise.all([getEmployees(), getEmployeeLogs(100)]);
@@ -26,7 +32,7 @@ function Admin() {
     loadStatistics().catch((error) => console.error(error));
   }, []);
 
-  // Anropas av AddPerson när man klickar "Add person" och sparar personen i databasen
+  // Called by AddPerson when "Add person" is clicked. Saves the person in the database
   async function handleAddPerson(
     name: string,
     permission: string,
@@ -44,13 +50,15 @@ function Admin() {
     await createEmployee({
       name,
       permission,
-      //heter description i backend
+      // Called description in the backend
       description: department,
       img: image,
     });
     setRegPersons((previous) => (previous === null ? null : previous + 1));
   }
 
+  // Called by AddPerson when a person with the Admin permission is added.
+  // Saves the person together with a username and password
   async function handleAddAdmin(
     name: string,
     permission: string,
@@ -82,7 +90,8 @@ function Admin() {
     <div className="content">
       <AdminHeader title="Admin " highlight="Panel" />
 
-      {/*De fyra korten ligger i ett rutnät*/}
+      {/* The four statistics cards are placed in a grid.
+          Denied entries and average confidence are fixed example values for now */}
       <div className="event-summary">
         <Summary
           icon={<User size={28} />}

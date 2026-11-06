@@ -3,23 +3,24 @@ import { login } from "../../../auth";
 import { useState, type SubmitEvent } from "react";
 import { useNavigate } from "react-router-dom";
 
-//Tar emot en prop som heter onClose
 type AdminLoginProps = {
+    /** Closes the login window. */
     onClose: () => void;
 };
 
+/** Login window for admins. Opens the admin interface if the login succeeds. */
 function AdminLogin({ onClose }: AdminLoginProps) {
     const [error, setError] = useState("");
     const navigate = useNavigate();
     async function handleSubmit(e: SubmitEvent<HTMLFormElement>) {
-        //Hindrar sidan från att ladda om
+        // Stops the page from reloading
         e.preventDefault();
-        //samlar ihop användarnamn och lösenord från formuläret i en lista
+        // Collects the username and password from the form
         const formData = new FormData(e.currentTarget);
-        //talar om för typescript att det är en sträng som hämtas från formuläret
+        // Tells TypeScript that the values from the form are strings
         const username = formData.get("username") as string;
         const password = formData.get("password") as string;
-        //skickar uppgifterna till backend, som svarar om de stämmer
+        // Sends the details to the backend, which answers whether they are correct
         try {
             if (!(await login(username, password))) {
                 setError("Wrong username or password");
@@ -50,7 +51,7 @@ function AdminLogin({ onClose }: AdminLoginProps) {
                         <button type="submit" className="button-primary">
                             Login
                         </button>
-                        {/*När någon trycker på knappen anropas onClose-funktionen*/}
+                        {/* Closes the login window without logging in */}
                         <button type="button" onClick={onClose} className="button-secondary">
                             Cancel
                         </button>

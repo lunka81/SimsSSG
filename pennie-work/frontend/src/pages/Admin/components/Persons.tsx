@@ -7,30 +7,31 @@ import { Plus } from "lucide-react";
 import "../Admin.css";
 import "./Persons.css";
 
-// Översätter backendens fältnamn till de som Person-typen använder
+// Converts the backend's field names to the ones the Person type uses
 function toPerson(employee: Employee): Person {
   return {
     id: employee.uuid,
     name: employee.name,
     permission: employee.permission,
-    //kallas för description i backend
+    // Called description in the backend
     department: employee.description ?? "",
   };
 }
 
+/** Admin page that lists all registered persons. */
 function Persons() {
   const [persons, setPersons] = useState<Person[]>([]);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
-  // Hämtar alla personer från databasen när sidan öppnas
+  // Fetches all persons from the database when the page opens
   useEffect(() => {
     getEmployees()
       .then((employees) => setPersons(employees.map(toPerson)))
       .catch((error) => setError(error.message));
   }, []);
 
-  // Tar bort personen ur databasen och ur listan
+  // Removes the person from the database and from the list
   async function deletePerson(id: string) {
     await deleteEmployee(id);
     setPersons((previous) => previous.filter((person) => person.id !== id));

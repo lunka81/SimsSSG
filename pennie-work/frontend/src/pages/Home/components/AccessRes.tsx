@@ -7,7 +7,6 @@ type AccessResProps = {
 function AccessRes({ approved }: AccessResProps) {
 
   return (
-    //ternary operator. Om approved = true så läggs klassen "approved" till annars "denied"
     <div className={`result-card ${approved ? "approved" : "denied"}`}>
       <div className="result-icon">
         {approved ? "✓" : "✕"}
@@ -16,10 +15,7 @@ function AccessRes({ approved }: AccessResProps) {
       <div className="result-divider"></div>
 
       <h2>
-        Access{" "}
-        <span>
-          {approved ? "granted" : "denied"}
-        </span>
+        Access <span>{approved ? "granted" : "denied"}</span>
       </h2>
     </div>
   );

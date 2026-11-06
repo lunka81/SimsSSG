@@ -7,7 +7,6 @@
     border-radius: 12px;
 }
 
-/*Mörkar ner sidan bakom rutan*/
 .person-details::backdrop {
     background: rgba(0, 0, 0, 0.7);
 }
@@ -20,20 +19,41 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 16px;
+}
+
+.person-details-heading {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-width: 0;
 }
 
 .person-details-header h2 {
     margin: 0;
 }
 
+.person-details-id {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.person-details-id code {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+}
+
 .person-details-body {
     display: grid;
-    grid-template-columns: 180px 1fr;
+    grid-template-columns: 180px minmax(0, 1fr);
     gap: 24px;
     margin-top: 20px;
 }
 
 .person-details-image {
+    display: block;
     width: 100%;
     aspect-ratio: 3 / 4;
     object-fit: cover;
@@ -41,10 +61,51 @@
     background: #222;
 }
 
-/*Rubrik till vänster, värde till höger*/
+.person-details-image-button {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: white;
+    cursor: pointer;
+}
+
+.person-details-camera-icon {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.7);
+    pointer-events: none;
+}
+
+.person-details-image-button:hover .person-details-camera-icon {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.person-details-image-button:focus-visible {
+    outline: 2px solid white;
+    outline-offset: 4px;
+}
+
+.person-details-image-button:disabled {
+    cursor: default;
+    opacity: 0.6;
+}
+
 .person-details-info {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    align-content: start;
     gap: 12px 16px;
     margin: 0;
     font-size: 14px;
@@ -54,39 +115,79 @@
     color: #aaa;
 }
 
+.person-details-info dt,
 .person-details-info dd {
     margin: 0;
+    align-self: center;
 }
 
-.person-details-id {
+.person-details-info dd.person-details-editable {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: space-between;
+    gap: 12px;
+    min-width: 0;
 }
 
-.person-details-id code {
+.person-details-editable > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.person-details .icon-button {
+    flex-shrink: 0;
+}
+
+.person-details-input {
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 8px 10px;
+    border: 1px solid #666;
+    border-radius: 6px;
+    background: #161616;
+    color: white;
+    font: inherit;
+    color-scheme: dark;
+}
+
+.person-details-input:focus {
+    outline: 2px solid #aaa;
+    outline-offset: 1px;
+}
+
+.person-details-note {
+    margin: 12px 0 0;
     font-size: 12px;
-    word-break: break-all;
+    color: #aaa;
 }
 
-/*Bilden hamnar över informationen på smala skärmar*/
-@media (max-width: 560px) {
-    .person-details-body {
-        grid-template-columns: 1fr;
-    }
+.person-details-error {
+    margin: 16px 0 0;
+    color: #ff9090;
 }
-/*Knapparna längst ner. Delete till vänster, övriga till höger*/
+
 .person-details-footer {
     display: flex;
     justify-content: flex-end;
+    flex-wrap: wrap;
     gap: 12px;
     margin-top: 24px;
     padding-top: 16px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-/*Skjuter Delete-knappen längst till vänster*/
 .person-details-footer .button-danger {
     margin-right: auto;
 }
 
+@media (max-width: 560px) {
+    .person-details-body {
+        grid-template-columns: 1fr;
+    }
+
+    .person-details-heading {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+}

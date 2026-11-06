@@ -6,18 +6,27 @@ import {
   useState,
 } from "react";
 
+/** Functions that a parent component can call on the camera through a ref. */
 export type CameraHandle = {
+  /** Turns off the webcam. */
   stopCamera: () => void;
+  /** Takes a picture of the current video frame. Returns a JPEG data URL, or null if no image is ready yet. */
   takeSnapshot: () => string | null;
 };
 
 type CameraProps = {
+  /** Starts the webcam as soon as the component is shown. */
   autoStart?: boolean;
 };
 
+/**
+ * Shows live video from the user's webcam.
+ * The parent component takes pictures and turns off the camera through a ref (see CameraHandle).
+ */
 const Camera = forwardRef<CameraHandle, CameraProps>(
   function Camera({ autoStart = false }, ref) {
     const videoRef = useRef<HTMLVideoElement>(null);
+    // The active video stream, saved so that the camera can be turned off later
     const streamRef = useRef<MediaStream | null>(null);
     const [error, setError] = useState<string | null>(null);
 
@@ -33,6 +42,7 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
     function takeSnapshot(): string | null {
       const video = videoRef.current;
 
+      // No picture can be taken before the video has received its first frame
       if (
         !video ||
         video.readyState < 2 ||
@@ -42,6 +52,7 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
         return null;
       }
 
+      // Draws the current frame on a hidden canvas and saves it as a JPEG image
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
@@ -54,11 +65,15 @@ const Camera = forwardRef<CameraHandle, CameraProps>(
       return canvas.toDataURL("image/jpeg");
     }
 
+    // Makes stopCamera and takeSnapshot available to the parent component
     useImperativeHandle(ref, () => ({
       stopCamera,
       takeSnapshot,
     }));
 
+    // Asks for access to the webcam and shows the video.
+    // cancelled is set if the component is removed before the camera has started,
+    // so that the stream is turned off and the camera light does not stay on
     useEffect(() => {
       if (!autoStart) return;
       const videoElement = videoRef.current;

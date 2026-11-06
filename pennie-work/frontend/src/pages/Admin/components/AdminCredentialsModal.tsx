@@ -3,16 +3,23 @@ import "./AdminCredentialsModal.css";
 import type { SubmitEvent } from "react";
 
 type AdminCredentialsModalProps = {
+    /** Name of the person who gets the admin login, shown in the heading. */
     personName: string;
+    /** Saves the admin. Called when the form is valid. */
     onConfirm: (username: string, password: string) => Promise<void>;
     onClose: () => void;
 };
 
+/**
+ * Popup where a username and password are chosen for a new admin.
+ * Checks that the password has at least 8 characters and that both passwords match.
+ */
 function AdminCredentialsModal({ personName, onConfirm, onClose }: AdminCredentialsModalProps) {
     const dialogRef = useRef<HTMLDialogElement>(null);
     const [error, setError] = useState<string | null>(null);
     const [saving, setSaving] = useState(false);
 
+    // Opens the dialog when the component is shown and closes it when it is removed
     useEffect(() => {
         const dialog = dialogRef.current;
 
@@ -67,6 +74,7 @@ function AdminCredentialsModal({ personName, onConfirm, onClose }: AdminCredenti
         <dialog
             ref={dialogRef}
             className="AdminPopUp"
+            // Esc closes the dialog, but not while the admin is being saved
             onCancel={(e) => {
                 e.preventDefault();
                 if (!saving) onClose();

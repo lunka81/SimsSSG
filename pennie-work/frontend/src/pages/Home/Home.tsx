@@ -5,23 +5,24 @@ import Confidence from "./components/Confidence";
 import AccessRes from "./components/AccessRes";
 import AdminLogin from "./components/AdminLogin";
 import RecognitionView from "./components/Recognition";
-import type { RecognitionResult } from "./components/Recognition";
+import type { Person } from "./components/Recognition";
 import "./Home.css";
 
-const TRAININGS = ["Introduction Fire safety",
+const TRAININGS = [
+  "Introduction Fire safety",
   "SSG Entre Contractor Safety",
-  "Information security and data protection"]
+  "Information security and data protection",
+];
 
 const RESET_DELAY_MS = 20000;
 
 function Home() {
-  const confidence = 80;
-  
   const [isAdminOpen, setIsAdminOpen] = useState(false);
-  const [result, setResult] = useState<RecognitionResult>(null);
+  const [person, setPerson] = useState<Person | null>(null);
+  const [matchScore, setMatchScore] = useState<number | null>(null);
+  const [approved, setApproved] = useState<boolean | null>(null);
 
-  const person = result !== null && result.status === "granted" ? result.person : null;
-  const denied = result !== null && result.status === "denied";
+  const denied = approved === false;
 
   useEffect(() => {
     function handleKeyDown(e: KeyboardEvent) {
@@ -39,21 +40,31 @@ function Home() {
   }, []);
 
   useEffect(() => {
-    if (result === null) return;
+    if (approved === null) return;
 
-    const timer = setTimeout(() => setResult(null), RESET_DELAY_MS);
+    const timer = setTimeout(() => {
+      setPerson(null);
+      setMatchScore(null);
+      setApproved(null);
+    }, RESET_DELAY_MS);
 
     return () => clearTimeout(timer);
-  }, [result]);
+  }, [person, matchScore, approved]);
 
   return (
     <main className="app">
-      <RecognitionView onResult={setResult} />
+      <RecognitionView
+        onRecognized={setPerson}
+        onMatchScore={setMatchScore}
+        onApproved={setApproved}
+      />
 
       <div className="content">
         <HomeHeader name={person?.name} />
 
-        {isAdminOpen && <AdminLogin onClose={() => setIsAdminOpen(false)} />}
+        {isAdminOpen && (
+          <AdminLogin onClose={() => setIsAdminOpen(false)} />
+        )}
 
         <section className="recognition">
           <ImageCard title="Person information">
@@ -72,6 +83,7 @@ function Home() {
 
                 <div className="trainings">
                   <h3>Trainings</h3>
+
                   <ul className="training-list">
                     {TRAININGS.map((training) => (
                       <li key={training}>
@@ -83,26 +95,42 @@ function Home() {
                 </div>
               </>
             ) : (
-              <p>Waiting for identification...</p>
+              <p>
+                {denied
+                  ? "No person identified."
+                  : "Waiting for identification..."}
+              </p>
             )}
           </ImageCard>
 
-          <Confidence value={confidence} />
+          <Confidence value={matchScore ?? 0} />
 
           <ImageCard
-            title={person ? "Matching image found" : denied ? "No match found" : ""}
-            image={person?.image ?? undefined}>
-            {denied ? (
+            title={
+              person
+                ? "Matching image found"
+                : denied
+                  ? "No match found"
+                  : ""
+            }
+            image={person?.image ?? undefined}
+          >
+            {denied && !person ? (
               <div className="no-match" role="alert">
                 <h3>No match found</h3>
-                <p>No person in the database matches the person in front of the camera.</p>
+                <p>
+                  No person in the database matches the person
+                  in front of the camera.
+                </p>
               </div>
             ) : undefined}
           </ImageCard>
         </section>
 
         <section className="access-res">
-          {result !== null && <AccessRes approved={person !== null} />}
+          {approved !== null && (
+            <AccessRes approved={approved} />
+          )}
         </section>
       </div>
     </main>
