@@ -12,7 +12,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from backend.db.database import get_session
 from uuid import UUID
 
-load_dotenv()
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
 SECRET_KEY = os.getenv('SECRET_KEY').strip()
 
 def create_access_token(admin: Admin) -> str:

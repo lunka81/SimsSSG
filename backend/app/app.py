@@ -26,7 +26,9 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(engine)
     yield
 
-load_dotenv()
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
 app = FastAPI(lifespan=lifespan, debug=os.getenv("DEBUG", "False").lower() == "true")
 #app = FastAPI(lifespan=lifespan, debug=os.getenv("DEBUG", "False").lower() == "true")
 app.include_router(camera_router)

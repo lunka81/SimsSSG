@@ -6,7 +6,9 @@ class Base(DeclarativeBase):
     pass
 
 
-load_dotenv()
+from pathlib import Path
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
+
 DATABASE_TEST_URL = os.getenv('DATABASE_URL').strip()
 engine = create_engine(DATABASE_TEST_URL)
 SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
