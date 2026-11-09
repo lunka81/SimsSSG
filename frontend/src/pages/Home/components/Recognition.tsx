@@ -32,10 +32,12 @@ export default function RecognitionView({ onRecognized, onMatchScore, onApproved
       const data: RecognitionMessage = JSON.parse(event.data);
       console.log("Resultat från backend:", data);
 
-      if (data.event === "person_recognized") {
-          onRecognized(data.person);
-          onMatchScore(data.match_score);
-          onApproved(data.approved);
+      // Both events update the view; person is null on a denied attempt,
+      // which also clears any previously shown person.
+      if (data.event === "person_recognized" || data.event === "person_not_recognized") {
+        onRecognized(data.person);
+        onMatchScore(data.match_score);
+        onApproved(data.approved);
       }
     };
 
