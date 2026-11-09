@@ -75,7 +75,7 @@ uvicorn backend.app.app:app --port 8000
 ```
 
 Add `--host 0.0.0.0` if the edge device runs on another machine. Interactive API docs are at
-<http://localhost:8000/docs>. On the first start the YuNet and SFace models are downloaded from
+<http://localhost:8000/docs0>, and more detailed docs are at <http://localhost:8000/redoc>. On the first start the YuNet and SFace models are downloaded from
 the OpenCV model zoo, so internet access is needed once.
 
 ### Create the first admin

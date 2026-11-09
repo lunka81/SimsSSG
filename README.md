@@ -64,12 +64,12 @@ LEDs (it prints what the lock would do instead).
 | Frontend | `http://localhost:5173` |
 | Edge device | `http://localhost:8001` |
 
-1. **Database**: start PostgreSQL with the pgvector extension, for example with Docker. See
+1. **Database**: install PostgreSQL and the  with the pgvector extension, for example with Docker. See
    [backend/README.md](backend/README.md#1-database).
 2. **Backend**: create `backend/.env` from [backend/.env.example](backend/.env.example), install
    the requirements and start it from the repository root:
    ```bash
-   uvicorn backend.app.app:app --port 8000
+   uvicorn backend.app.app:app --host 0.0.0.0 --port 8000
    ```
 3. **First admin**: create an admin account from the command line (the web app needs an existing admin):
    ```bash

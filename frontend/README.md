@@ -5,7 +5,7 @@ It has two parts:
 
 - **Access view** (`/`): meant for a screen at the gate. It shows each access attempt live:
   the person's name, photo, permission, department and match score when access is granted, or
-  "access denied" when no match is found. It resets after 20 seconds.
+  "access denied" when no match is found. It resets after 6 seconds.
 - **Admin interface** (`/admin`): login-protected pages for managing the system.
 
 The frontend only talks to the [backend](../backend/) and never to the database or the edge device.
@@ -19,19 +19,6 @@ cd frontend
 npm install
 npm run dev        # development server on http://localhost:5173
 ```
-
-Other scripts:
-
-| Command | Purpose |
-|---|---|
-| `npm run build` | Type-check and build for production into `dist/`. |
-| `npm run preview` | Serve the production build locally. |
-| `npm run lint` | Run ESLint. |
-
-> **Known issue:** `npm run build` currently stops at the type check with three TypeScript errors
-> (`approved` is missing on `EmployeeLog` in `PersonDetails.tsx`, and `permission` is missing on
-> `Person` in `Persons.tsx`). The app itself works, and `npm run dev` isn't affected. Fix the types
-> in `src/api/employees.ts`, or run `npx vite build` to build without the type check.
 
 ## Using the app
 

@@ -14,7 +14,7 @@ const TRAININGS = [
   "Information security and data protection",
 ];
 
-const RESET_DELAY_MS = 20000;
+const RESET_DELAY_MS = 6000;
 
 function Home() {
   const [isAdminOpen, setIsAdminOpen] = useState(false);
