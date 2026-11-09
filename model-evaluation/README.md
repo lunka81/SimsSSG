@@ -1,15 +1,34 @@
-# FaceEval
+# Model evaluation
 
-Tests the face recognition models on the images in `dataset/`, using the reference
-images in `ReferenceImages/`. `001_frontal.JPG`, which resides in `ReferenceImages/`, is the person in the dataset.
+Offline tool that measures how well the face recognition pipeline works. It uses the same models
+and settings as the [edge device](../edge-device/) and [backend](../backend/): YuNet face detection,
+MiniFASNet liveness, SFace embeddings and nearest-neighbour matching with cosine similarity ≥ 0.363.
+The recognition results in the project report were produced with this tool. All settings are in
+[config.py](config.py).
 
-YuNet face detection, MiniFASNet liveness, SFace embeddings and nearest-neighbour matching with
-cosine similarity ≥ 0.363. All settings are in [config.py](config.py).
-
-This consists of two parts:
+It consists of two parts:
 
 1. **Pipeline** ([pipeline/](pipeline/)) runs every image through the models and writes `results/results.csv`.
 2. **Presentation** ([presentation/](presentation/)) reads that CSV and writes plots and tables to `report/`.
+
+## Input data (not included)
+
+The images aren't part of the repository, because they show real people (the test subject and the
+Color FERET dataset, which has its own license). To run the evaluation, add them like this:
+
+```
+model-evaluation/
+├── ReferenceImages/        # the gallery: one front-facing *.JPG per enrolled person
+│   ├── 001_frontal.JPG     # the test subject (SELF_REFERENCE in config.py)
+│   └── ...                 # everyone else; filename = identity
+└── dataset/
+    ├── metadata.csv        # one row per test image
+    └── ...                 # the test images, in any folder structure
+```
+
+`metadata.csv` needs the columns `distance, angle, headwear, glasses, lighting, case_folder, image, path`,
+where `path` is relative to `dataset/`. The condition columns are free text and are used to group
+the plots. Every test image should show the person in `SELF_REFERENCE`.
 
 ## Setup
 
@@ -33,7 +52,9 @@ python -m presentation    # writes report/
 ## GPU
 
 SFace and the liveness models run in `onnxruntime-gpu` on CUDA. The pipeline prints which device is
-used. Set `USE_GPU = False` in `config.py` to run on the CPU. 
+used. Set `USE_GPU = False` in `config.py` to run on the CPU. Without an NVIDIA GPU you can
+replace `onnxruntime-gpu[cuda,cudnn]` with `onnxruntime` in `requirements.txt`. The device only
+affects running time, not the results.
 
 ## Another recognition model
 

@@ -1,14 +1,26 @@
+# Python
 .venv/
 venv/
-.env
 __pycache__/
 *.pyc
-*.exe
-.idea/workspace.xml
+
+# Secrets: copy .env.example to .env in backend/ and edge-device/
+.env
+
+# Model files (downloaded automatically on first start)
 *.onnx
-test_identify.py
-__pycache__/
-.idea/
-# Unfinished model download, see recognition/model_files.py
 *.part
 model_weights/
+
+# Node / frontend build output
+node_modules/
+dist/
+
+# Editors and OS
+.idea/
+.vscode/
+.DS_Store
+
+# Misc
+*.exe
+test_identify.py

@@ -1,6 +1,6 @@
 """Read results/results.csv and write plots and summary tables to report/.
 
-Run from the FaceEval folder: python -m presentation
+Run from the model-evaluation folder: python -m presentation
 """
 from pathlib import Path
 
