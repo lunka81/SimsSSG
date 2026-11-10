@@ -4,7 +4,7 @@ Two tests use the same image embeddings, only the reference gallery differs:
   included: all reference images, the person in the dataset is known
   excluded: all reference images except SELF_REFERENCE, the person is unknown (any approval is a false accept)
 
-Run from the FaceEval folder: python -m pipeline
+Run from the model-evaluation folder: python -m pipeline
 """
 import csv
 
