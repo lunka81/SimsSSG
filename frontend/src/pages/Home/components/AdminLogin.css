@@ -1,75 +1,72 @@
-.result-card {
-  width: 100%;
-  min-height: 120px;
-
-  display: flex;
-  align-items: center;
-  gap: 30px;
-
-  padding: 20px 30px;
-
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid #ff6a00;
-  border-radius: 20px;
+.admin-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /*Så att rutan hamnar utanpå andra element */
+    z-index: 1000;
 }
 
-.result-icon {
-  width: 70px;
-  aspect-ratio: 1;
-  flex-shrink: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 50%;
-
-  font-size: 40px;
-  font-weight: bold;
+.admin-modal {
+    background: #080808;
+    color: black;
+    padding: 24px;
+    border: 1px solid #ff6a00;
+    border-radius: 12px;
+    width: min(90%, 360px);
 }
 
-.result-divider {
-  width: 1px;
-  height: 70px;
-  flex-shrink: 0;
+.admin-modal h2 {
+    color: #ff6a00;
+    margin: 0;
 }
 
-.result-card h2 {
-  margin: 0;
+.login-line {
+    width: 55px;
+    height: 4px;
+    margin-top: 10px;
 
-  font-size: clamp(24px, 4vw, 42px);
+    background: #ff6a00;
+    border-radius: 10px;
 }
 
-/*approved*/
-.result-card.approved {
-  border-color: #ff6a00;
+.admin-modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
 }
 
-.result-card.approved .result-icon {
-  background: #43a047;
+.admin-modal label {
+    display: flex;
+    flex-direction: column;
+    color: #aaa;
+    gap: 5px;
+    font-size: 14px;
 }
 
-.result-card.approved .result-divider {
-  background: #ff6a00;
+.admin-modal input {
+    outline: none;
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 4px;
+    padding: 8px;
 }
 
-.result-card.approved h2 span {
-  color: #43a047;
+.admin-modal input:focus {
+    border: 1px solid #ff6a00;
 }
 
-/*denied*/
-.result-card.denied {
-  border-color: #ff6a00;
+.login-error {
+    color: red;
+    font-size: 14px;
+    margin: 0;
 }
 
-.result-card.denied .result-icon {
-  background: #e53935;
-}
-
-.result-card.denied .result-divider {
-  background: #ff6a00;
-}
-
-.result-card.denied h2 span {
-  color: #e53935;
+.buttons {
+    display: flex;
+    flex-direction: row-reverse;
+    gap: 12px;
+    margin-top: 12px;
 }
